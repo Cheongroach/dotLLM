@@ -160,6 +160,20 @@ public sealed class IncrementalDetokenizerTests
     }
 
     [Fact]
+    public void StableDelta_DoesNotEmitIncompleteUtf8()
+    {
+        var tokenizer = BuildByteFallbackVocab();
+        var detokenizer = new IncrementalDetokenizer(tokenizer);
+        detokenizer.Append(2 + 0xC3);
+        Assert.Equal("", detokenizer.TakeDelta(flushIncomplete: false));
+        detokenizer.Append(2 + 0xA9);
+        Assert.Equal("é", detokenizer.TakeDelta(flushIncomplete: false));
+        detokenizer.Append(2 + 0xC3);
+        Assert.Equal("", detokenizer.TakeDelta(flushIncomplete: false));
+        Assert.Equal("\uFFFD", detokenizer.TakeDelta());
+    }
+
+    [Fact]
     public void ByteFallbackTokens_LongRun_MatchesBulkDecode()
     {
         var tok = BuildByteFallbackVocab();

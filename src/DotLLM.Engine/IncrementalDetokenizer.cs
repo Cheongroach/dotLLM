@@ -122,10 +122,17 @@ internal sealed class IncrementalDetokenizer
     /// Returns the text appended since the previous call to <see cref="TakeDelta"/>
     /// (or since construction). Advances the baseline to the current length.
     /// </summary>
-    public string TakeDelta()
+    public string TakeDelta(bool flushIncomplete = true)
     {
         int total = Length;
-        if (total == _deltaBaseline)
+        if (!flushIncomplete)
+        {
+            int trailing = _windowText.Length;
+            while (trailing > 0 && (_windowText[trailing - 1] == '\uFFFD' || char.IsHighSurrogate(_windowText[trailing - 1])))
+                trailing--;
+            total -= _windowText.Length - trailing;
+        }
+        if (total <= _deltaBaseline)
             return string.Empty;
 
         string delta = SliceRange(_deltaBaseline, total);
