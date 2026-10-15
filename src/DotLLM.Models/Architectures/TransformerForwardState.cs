@@ -18,6 +18,7 @@ internal sealed unsafe class TransformerForwardState : IDisposable
     private readonly int _vocabSize;
 
     private int _currentSeqLen;
+    private int _logitRows;
 
     /// <summary>Total bytes currently allocated for inference scratch buffers.</summary>
     public long AllocatedBytes
@@ -32,7 +33,7 @@ internal sealed unsafe class TransformerForwardState : IDisposable
             bytes += s * _numHeads * _headDim * 2;           // Q + AttnOutput
             bytes += s * _numKvHeads * _headDim * 2;         // K + V
             bytes += s * _intermediateSize * 3;              // FfnGate + FfnUp + SiluOutput
-            bytes += s * _vocabSize;                          // Logits (all positions for speculative verify)
+            bytes += (long)_logitRows * _vocabSize;                          // Logits (all positions for speculative verify)
             bytes *= sizeof(float);
             // InputQ8Scratch: seqLen × max(Q8_0, Q8_1, Q8_K) row bytes
             int maxInputDim = Math.Max(_hiddenSize, _intermediateSize);
@@ -99,8 +100,16 @@ internal sealed unsafe class TransformerForwardState : IDisposable
     /// Ensures all scratch buffers are large enough for <paramref name="seqLen"/> tokens.
     /// Uses power-of-2 growth to amortize reallocation cost.
     /// </summary>
-    public void EnsureCapacity(int seqLen)
+    public void EnsureCapacity(int seqLen, int logitRows = 0)
     {
+        if (logitRows == 0) logitRows = seqLen;
+        if (logitRows > _logitRows)
+        {
+            int capacity = (int)BitOperations.RoundUpToPowerOf2((uint)logitRows);
+            FreeIfNonZero(ref Logits);
+            Logits = AllocFloats((long)capacity * _vocabSize);
+            _logitRows = capacity;
+        }
         if (seqLen <= _currentSeqLen)
             return;
 
@@ -117,7 +126,6 @@ internal sealed unsafe class TransformerForwardState : IDisposable
         FfnGate = AllocFloats(newCapacity * _intermediateSize);
         FfnUp = AllocFloats(newCapacity * _intermediateSize);
         SiluOutput = AllocFloats(newCapacity * _intermediateSize);
-        Logits = AllocFloats((long)newCapacity * _vocabSize); // All positions' logits for speculative verify
 
         // InputQ8Scratch: seqLen × max(q8_0RowBytes, q8_1RowBytes, q8_kRowBytes) for pre-quantized GEMM input reuse.
         // Q8_0: 34 bytes per 32-element block. Q8_1: 36 bytes per 32-element block. Q8_K: 292 bytes per 256-element block.
@@ -153,7 +161,6 @@ internal sealed unsafe class TransformerForwardState : IDisposable
         FreeIfNonZero(ref FfnGate);
         FreeIfNonZero(ref FfnUp);
         FreeIfNonZero(ref SiluOutput);
-        FreeIfNonZero(ref Logits);
         FreeIfNonZero(ref InputQ8Scratch);
     }
 
@@ -169,6 +176,8 @@ internal sealed unsafe class TransformerForwardState : IDisposable
     public void Dispose()
     {
         FreeBuffers();
+        FreeIfNonZero(ref Logits);
+        _logitRows = 0;
         _currentSeqLen = 0;
     }
 }

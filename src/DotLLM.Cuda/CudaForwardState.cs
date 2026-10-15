@@ -18,6 +18,9 @@ internal sealed class CudaForwardState : IDisposable
     private readonly int _vocabSize;
 
     private int _currentSeqLen;
+    private int _logitsCapacity;
+    private long _dequantCapacity;
+    private readonly Dictionary<nint, long> _allocations = new();
 
     /// <summary>Total bytes currently allocated on GPU.</summary>
     public long AllocatedBytes { get; private set; }
@@ -61,16 +64,14 @@ internal sealed class CudaForwardState : IDisposable
         _vocabSize = vocabSize;
         _currentSeqLen = 0;
 
-        // Logits are fixed-size (only last token)
-        LogitsF16 = AllocDevice((long)vocabSize * sizeof(ushort));
-        LogitsF32 = AllocDevice((long)vocabSize * sizeof(float));
+        EnsureLogitsCapacity(1);
 
         // Dequant scratch: sized for the largest per-layer projection in FP16.
         // Used for on-the-fly dequantization of quantized weights before cuBLAS GEMM.
         long maxProjectionElements = Math.Max(
             (long)Math.Max(numHeads * headDim, numKvHeads * headDim) * hiddenSize,
             (long)intermediateSize * hiddenSize);
-        DequantScratch = AllocDevice(maxProjectionElements * sizeof(ushort));
+        EnsureDequantCapacity(maxProjectionElements);
 
         // Initial allocation for decode (seqLen=1)
         EnsureCapacity(1);
@@ -112,9 +113,30 @@ internal sealed class CudaForwardState : IDisposable
         _currentSeqLen = newCapacity;
     }
 
+    /// <summary>Grows dequantization storage before launching a forward, with no GPU work in flight.</summary>
+    public void EnsureDequantCapacity(long elements)
+    {
+        if (elements <= _dequantCapacity) return;
+        FreeIfNonZero(ref DequantScratch);
+        DequantScratch = AllocDevice(checked(elements * sizeof(ushort)));
+        _dequantCapacity = elements;
+    }
+
+    /// <summary>Allocates one logits row per sequence, independently of the packed prompt token count.</summary>
+    public void EnsureLogitsCapacity(int rows)
+    {
+        if (rows <= _logitsCapacity) return;
+        FreeIfNonZero(ref LogitsF16);
+        FreeIfNonZero(ref LogitsF32);
+        _logitsCapacity = (int)BitOperations.RoundUpToPowerOf2((uint)rows);
+        LogitsF16 = AllocDevice((long)_logitsCapacity * _vocabSize * sizeof(ushort));
+        LogitsF32 = AllocDevice((long)_logitsCapacity * _vocabSize * sizeof(float));
+    }
+
     private nint AllocDevice(long bytes)
     {
         CudaDriverApi.cuMemAlloc_v2(out nint ptr, (nuint)bytes).ThrowOnError();
+        _allocations.Add(ptr, bytes);
         AllocatedBytes += bytes;
         return ptr;
     }
@@ -124,6 +146,7 @@ internal sealed class CudaForwardState : IDisposable
         if (ptr != 0)
         {
             CudaDriverApi.cuMemFree_v2(ptr);
+            if (_allocations.Remove(ptr, out long bytes)) AllocatedBytes -= bytes;
             ptr = 0;
         }
     }

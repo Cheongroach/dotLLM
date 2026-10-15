@@ -16,7 +16,7 @@ namespace DotLLM.Models.Architectures;
 /// Transformer forward pass: embedding lookup → N × transformer blocks → final norm → LM head → logits.
 /// Operates entirely on the CPU using pre-allocated scratch buffers for zero-allocation inference.
 /// </summary>
-public sealed unsafe class TransformerModel : IModel
+public sealed unsafe class TransformerModel : IBatchedModel
 {
     /// <summary>Q8_0 block: 2 bytes (Half scale) + 32 bytes (sbyte values).</summary>
     private const int Q8_0BlockBytes = 34;
@@ -136,7 +136,21 @@ public sealed unsafe class TransformerModel : IModel
     /// <returns>Logits tensor of shape [seqLen, vocab_size] for all input positions.</returns>
     public ITensor Forward(ReadOnlySpan<int> tokenIds, ReadOnlySpan<int> positions,
                            int deviceId, IKvCache? kvCache)
+        => ForwardCore(tokenIds, positions, deviceId, kvCache, default);
+
+    /// <inheritdoc/>
+    public ITensor ForwardBatch(ReadOnlySpan<int> tokenIds, ReadOnlySpan<int> positions,
+        ReadOnlySpan<SequenceBatch> sequences, int deviceId)
     {
+        SequenceBatch.Validate(tokenIds, positions, sequences, Config);
+        return ForwardCore(tokenIds, positions, deviceId, null, sequences);
+    }
+
+    private ITensor ForwardCore(ReadOnlySpan<int> tokenIds, ReadOnlySpan<int> positions,
+        int deviceId, IKvCache? kvCache, ReadOnlySpan<SequenceBatch> sequences)
+    {
+        if (tokenIds.IsEmpty || tokenIds.Length != positions.Length)
+            throw new ArgumentException("Expected non-empty tokens with matching positions.");
         int maxSeq = Config.MaxSequenceLength;
         for (int i = 0; i < positions.Length; i++)
         {
@@ -155,7 +169,7 @@ public sealed unsafe class TransformerModel : IModel
         int kvStride = numKvHeads * headDim;
         float eps = Config.NormEpsilon;
 
-        _state.EnsureCapacity(seqLen);
+        _state.EnsureCapacity(seqLen, sequences.IsEmpty ? seqLen : sequences.Length);
 
         // Adaptive dispatch mode: spin-wait for decode (short, frequent dispatches),
         // event-based for prefill (long dispatches where kernel transition cost is negligible).
@@ -262,39 +276,21 @@ public sealed unsafe class TransformerModel : IModel
                 numHeads, numKvHeads, headDim, _ropeDim,
                 _state.CosTable, _state.SinTable, _ropeType);
 
-            // e. Attention — with or without KV-cache
-            if (kvCache is not null)
+            // Projection work is packed across requests; attention is isolated by sequence.
+            if (!sequences.IsEmpty)
             {
-                // Store new K/V in cache, then attend over full cached context (zero allocations)
-                var kRef = new TensorRef(seqLen, kvStride, DType.Float32, -1, (nint)k);
-                var vRef = new TensorRef(seqLen, kvStride, DType.Float32, -1, (nint)v);
-
-                kvCache.Update(kRef, vRef, positions, layer);
-
-                int seqKv = kvCache.CurrentLength;
-
-                if (kvCache is IQuantizedKvCache qkvCache)
+                foreach (var sequence in sequences)
                 {
-                    // Quantized path: dequantize KV tiles on-the-fly during attention
-                    Attention.Execute(q, qkvCache, layer, attnOut,
-                        seqLen, seqKv, numHeads, numKvHeads, headDim, positions[0], _threadPool,
-                        _slidingWindowSize);
-                }
-                else
-                {
-                    var cachedK = kvCache.GetKeysRef(layer);
-                    var cachedV = kvCache.GetValuesRef(layer);
-
-                    Attention.Execute(q, (float*)cachedK.DataPointer, (float*)cachedV.DataPointer, attnOut,
-                        seqLen, seqKv, numHeads, numKvHeads, headDim, positions[0], _threadPool,
-                        _slidingWindowSize);
+                    int offset = sequence.TokenOffset;
+                    Attend(q + (long)offset * numHeads * headDim,
+                        k + (long)offset * kvStride, v + (long)offset * kvStride,
+                        attnOut + (long)offset * numHeads * headDim,
+                        positions.Slice(offset, sequence.TokenCount), layer, sequence.Cache);
                 }
             }
             else
             {
-                Attention.Execute(q, k, v, attnOut,
-                    seqLen, seqLen, numHeads, numKvHeads, headDim, 0, _threadPool,
-                    _slidingWindowSize);
+                Attend(q, k, v, attnOut, positions, layer, kvCache);
             }
 
             // f. Batched O projection
@@ -410,21 +406,59 @@ public sealed unsafe class TransformerModel : IModel
             new Span<float>(normOutT, hiddenSize).CopyTo(new Span<float>(hiddenT, hiddenSize));
         }
 
-        // 4. LM HEAD — all positions (enables batched speculative decoding verification)
+        // Batched serving only needs the final row of each segment. Compact normalized hidden
+        // states into existing scratch before the shared LM projection (no vocab-sized intermediates).
+        int logitRows = sequences.IsEmpty ? seqLen : sequences.Length;
+        float* headInput = hidden;
+        if (!sequences.IsEmpty)
         {
-            var rwOutput = _weights.RepackedOutput ?? default;
-            GemmInterleaved(_weights.OutputWeight, _weights.OutputQuantType,
-                hidden, logits, _weights.OutputOutputDim, _weights.OutputInputDim, seqLen,
-                null, in rwOutput);
+            for (int i = 0; i < sequences.Length; i++)
+            {
+                int last = sequences[i].TokenOffset + sequences[i].TokenCount - 1;
+                new ReadOnlySpan<float>(hidden + (long)last * hiddenSize, hiddenSize)
+                    .CopyTo(new Span<float>(normOut + (long)i * hiddenSize, hiddenSize));
+            }
+            headInput = normOut;
         }
+        var rwOutput = _weights.RepackedOutput ?? default;
+        GemmInterleaved(_weights.OutputWeight, _weights.OutputQuantType,
+            headInput, logits, _weights.OutputOutputDim, _weights.OutputInputDim, logitRows,
+            null, in rwOutput);
 
-        // 5. RETURN [seqLen, vocabSize]
-        var shape = new TensorShape(seqLen, vocabSize);
-        var result = UnmanagedTensor.Allocate(shape, DType.Float32, deviceId);
-        new Span<float>(logits, seqLen * vocabSize).CopyTo(
-            new Span<float>((void*)result.DataPointer, seqLen * vocabSize));
+        var shape = new TensorShape(logitRows, vocabSize);
+        var result = UnmanagedTensor.Allocate(shape, DType.Float32, -1);
+        new ReadOnlySpan<float>(logits, checked(logitRows * vocabSize)).CopyTo(
+            new Span<float>((void*)result.DataPointer, checked(logitRows * vocabSize)));
 
         return result;
+    }
+
+    private void Attend(float* q, float* k, float* v, float* output,
+        ReadOnlySpan<int> positions, int layer, IKvCache? cache)
+    {
+        int count = positions.Length;
+        int stride = Config.NumKvHeads * Config.HeadDim;
+        cache?.Update(new TensorRef(count, stride, DType.Float32, -1, (nint)k),
+            new TensorRef(count, stride, DType.Float32, -1, (nint)v), positions, layer);
+        if (cache is IPagedKvCache paged)
+        {
+            PagedAttention.Execute(q, paged, layer, output, count, Config.NumAttentionHeads,
+                Config.NumKvHeads, Config.HeadDim, positions[0], _threadPool, _slidingWindowSize);
+        }
+        else if (cache is IQuantizedKvCache quantized)
+        {
+            Attention.Execute(q, quantized, layer, output, count, cache.CurrentLength,
+                Config.NumAttentionHeads, Config.NumKvHeads, Config.HeadDim, positions[0],
+                _threadPool, _slidingWindowSize);
+        }
+        else
+        {
+            Attention.Execute(q, cache is null ? k : (float*)cache.GetKeysRef(layer).DataPointer,
+                cache is null ? v : (float*)cache.GetValuesRef(layer).DataPointer,
+                output, count, cache?.CurrentLength ?? count, Config.NumAttentionHeads,
+                Config.NumKvHeads, Config.HeadDim, cache is null ? 0 : positions[0],
+                _threadPool, _slidingWindowSize);
+        }
     }
 
     /// <summary>

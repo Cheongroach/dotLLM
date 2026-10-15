@@ -13,7 +13,7 @@ namespace DotLLM.Cuda;
 /// CUDA stream with no host synchronization until the final logits D2H transfer.
 /// Mirrors <see cref="TransformerModel"/> structure but uses cuBLAS GEMM/GEMV and custom PTX kernels.
 /// </summary>
-public sealed unsafe class CudaTransformerModel : IModel
+public sealed unsafe class CudaTransformerModel : IBatchedModel
 {
     private readonly CudaWeights _weights;
     private readonly CudaForwardState _state;
@@ -136,8 +136,47 @@ public sealed unsafe class CudaTransformerModel : IModel
     public ITensor Forward(ReadOnlySpan<int> tokenIds, ReadOnlySpan<int> positions,
                            int deviceId, IKvCache? kvCache)
     {
+        if (kvCache is CudaPagedKvCache)
+            return ForwardBatch(tokenIds, positions, [new SequenceBatch(0, tokenIds.Length, kvCache)], deviceId);
         _context.MakeCurrent();
+        try { return ForwardCore(tokenIds, positions, kvCache, []); }
+        catch { _stream.Synchronize(); throw; }
+    }
+
+    /// <inheritdoc/>
+    public ITensor ForwardBatch(ReadOnlySpan<int> tokenIds, ReadOnlySpan<int> positions,
+        ReadOnlySpan<SequenceBatch> sequences, int deviceId)
+    {
+        SequenceBatch.Validate(tokenIds, positions, sequences, Config);
+        _context.MakeCurrent();
+        _kernels.RequirePagedAttention();
+        foreach (var segment in sequences)
+        {
+            if (segment.Cache is not CudaPagedKvCache cache ||
+                cache.Factory.ContextHandle != _context.Handle || cache.Factory.NumLayers != Config.NumLayers ||
+                cache.Factory.KvStride != Config.NumKvHeads * Config.HeadDim)
+                throw new ArgumentException("CUDA batches require compatible GPU paged caches on the model context.", nameof(sequences));
+        }
+        try
+        {
+            foreach (var segment in sequences)
+                ((CudaPagedKvCache)segment.Cache).Prepare(positions[segment.TokenOffset + segment.TokenCount - 1] + 1);
+            return ForwardCore(tokenIds, positions, null, sequences);
+        }
+        catch
+        {
+            // Drain queued kernels before the scheduler can return/reuse their physical pages.
+            _stream.Synchronize();
+            throw;
+        }
+    }
+
+    private ITensor ForwardCore(ReadOnlySpan<int> tokenIds, ReadOnlySpan<int> positions,
+        IKvCache? kvCache, ReadOnlySpan<SequenceBatch> sequences)
+    {
         int seqLen = tokenIds.Length;
+        if (seqLen == 0 || positions.Length != seqLen) throw new ArgumentException("Expected nonempty tokens and matching positions.");
+        int outputRows = sequences.IsEmpty ? 1 : sequences.Length;
         int hiddenSize = Config.HiddenSize;
         int numHeads = Config.NumAttentionHeads;
         int numKvHeads = Config.NumKvHeads;
@@ -152,6 +191,12 @@ public sealed unsafe class CudaTransformerModel : IModel
         nint cublasH = _cublas.Handle;
 
         _state.EnsureCapacity(seqLen);
+        _state.EnsureLogitsCapacity(outputRows);
+        // The batched LM head may exceed per-layer projections. Reserve its scratch before
+        // launching kernels, without charging single-sequence quantized GEMV this extra VRAM.
+        if (_weights.OutputWeight == 0 &&
+            (outputRows > 1 || !CudaKernels.HasQuantizedGemv(_weights.OutputQuantType)))
+            _state.EnsureDequantCapacity((long)_weights.OutputOutputDim * _weights.OutputInputDim);
 
         // 1. Upload tokenIds + positions to device
         fixed (int* tokenPtr = tokenIds)
@@ -217,7 +262,24 @@ public sealed unsafe class CudaTransformerModel : IModel
                 _ropeDim, _ropeTheta, effectiveRopeType, s);
 
             // KV-cache update + Attention (FP16)
-            if (kvCache is CudaQuantizedKvCache cudaQKvCache)
+            if (!sequences.IsEmpty)
+            {
+                foreach (var segment in sequences)
+                {
+                    var cache = (CudaPagedKvCache)segment.Cache;
+                    var pool = cache.Factory;
+                    nint kvOffset = (nint)((long)segment.TokenOffset * numKvHeads * headDim * h);
+                    nint qOffset = (nint)((long)segment.TokenOffset * numHeads * headDim * h);
+                    int position = positions[segment.TokenOffset];
+                    _kernels.LaunchScatterPagedKv(_state.K + kvOffset, _state.V + kvOffset,
+                        pool.Keys(layer), pool.Values(layer), cache.TableDevice, pool.BlockSize,
+                        segment.TokenCount, pool.KvStride, position, s);
+                    _kernels.LaunchPagedAttention(_state.Q + qOffset, pool.Keys(layer), pool.Values(layer),
+                        _state.AttnOutput + qOffset, cache.TableDevice, pool.BlockSize,
+                        segment.TokenCount, cache.CurrentLength, numHeads, numKvHeads, headDim, position, slidingWindow, s);
+                }
+            }
+            else if (kvCache is CudaQuantizedKvCache cudaQKvCache)
             {
                 cudaQKvCache.UpdateDevice(_state.K, _state.V, positions, seqLen, layer, s, _kernels);
                 int seqKv = cudaQKvCache.CurrentLength;
@@ -286,25 +348,27 @@ public sealed unsafe class CudaTransformerModel : IModel
             }
         }
 
-        // 5. Final RmsNorm (last token only)
-        nint lastHidden = _state.HiddenState + (nint)((seqLen - 1) * hiddenSize * h);
-        _kernels.LaunchRmsNorm(lastHidden, _weights.OutputNormWeight, _state.NormOutput,
-            hiddenSize, eps, 1, s);
-
-        // 6. LM head (last token only) → FP16 logits, then convert to FP32
+        // Normalize only the final hidden row of each sequence, packed for one LM-head GEMM.
+        for (int row = 0; row < outputRows; row++)
+        {
+            int last = sequences.IsEmpty ? seqLen - 1 : sequences[row].TokenOffset + sequences[row].TokenCount - 1;
+            nint lastHidden = _state.HiddenState + (nint)((long)last * hiddenSize * h);
+            _kernels.LaunchRmsNorm(lastHidden, _weights.OutputNormWeight,
+                _state.NormOutput + (nint)((long)row * hiddenSize * h), hiddenSize, eps, 1, s);
+        }
         Project(_weights.OutputWeightQuant, _weights.OutputQuantType, _weights.OutputWeight,
-            _state.NormOutput, _state.LogitsF16,
-            _weights.OutputOutputDim, _weights.OutputInputDim, 1);
-        _kernels.LaunchConvertF16ToF32(_state.LogitsF16, _state.LogitsF32, vocabSize, s);
-
-        // 7. Stream sync (single sync point for entire forward pass)
+            _state.NormOutput, _state.LogitsF16, _weights.OutputOutputDim, _weights.OutputInputDim, outputRows);
+        int logitsCount = checked(outputRows * vocabSize);
+        _kernels.LaunchConvertF16ToF32(_state.LogitsF16, _state.LogitsF32, logitsCount, s);
         _stream.Synchronize();
 
-        // 8. D2H copy FP32 logits to CPU UnmanagedTensor
-        var shape = new TensorShape(1, vocabSize);
-        var result = UnmanagedTensor.Allocate(shape, DType.Float32, deviceId: -1);
-        CudaDriverApi.cuMemcpyDtoH_v2(result.DataPointer, _state.LogitsF32,
-            (nuint)(vocabSize * sizeof(float))).ThrowOnError();
+        var result = UnmanagedTensor.Allocate(new TensorShape(outputRows, vocabSize), DType.Float32, deviceId: -1);
+        try
+        {
+            CudaDriverApi.cuMemcpyDtoH_v2(result.DataPointer, _state.LogitsF32,
+                (nuint)((long)logitsCount * sizeof(float))).ThrowOnError();
+        }
+        catch { result.Dispose(); throw; }
 
         return result;
     }
@@ -371,9 +435,20 @@ public sealed unsafe class CudaTransformerModel : IModel
         return new CudaQuantizedKvCache(Config.NumLayers, Config.NumKvHeads, Config.HeadDim, maxSeqLen, config);
     }
 
+    /// <summary>Creates an exclusive shared GPU page pool for a continuous scheduler. Dispose it before the model.</summary>
+    public CudaPagedKvCacheFactory CreatePagedKvCacheFactory(int maxTotalTokens = 65536, int blockSize = 16)
+    {
+        _context.MakeCurrent();
+        _kernels.RequirePagedAttention();
+        return new CudaPagedKvCacheFactory(_context, Config.NumLayers, Config.NumKvHeads, Config.HeadDim,
+            blockSize, maxTotalTokens);
+    }
+
     /// <inheritdoc/>
     public void Dispose()
     {
+        _context.MakeCurrent();
+        _stream.Synchronize();
         _state.Dispose();
         _weights.Dispose();
         _kernels.Dispose();
