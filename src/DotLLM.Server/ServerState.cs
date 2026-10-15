@@ -18,6 +18,14 @@ namespace DotLLM.Server;
 public sealed class ServerState : IDisposable
 {
     private readonly SemaphoreSlim _requestGate = new(1, 1);
+    private readonly object _drainLock = new();
+    private int _inflight;
+    private TaskCompletionSource? _drained;
+    private bool _disposed;
+
+    /// <summary>Single compute owner for continuous batching, when enabled.</summary>
+    public ContinuousBatchScheduler? Scheduler { get; set; }
+
 
     /// <summary>Server startup options (updated on model swap).</summary>
     public required ServerOptions Options { get; set; }
@@ -36,6 +44,9 @@ public sealed class ServerState : IDisposable
 
     /// <summary>Paged KV-cache factory (non-null when paged mode is active). Owns the shared block pool.</summary>
     public PagedKvCacheFactory? PagedFactory { get; set; }
+
+    /// <summary>GPU page pool, disposed after the scheduler and before its model/context.</summary>
+    public DotLLM.Cuda.CudaPagedKvCacheFactory? CudaPagedFactory { get; set; }
 
     /// <summary>Prefix cache for prompt caching (null when disabled).</summary>
     public PrefixCache? PrefixCache { get; set; }
@@ -76,14 +87,49 @@ public sealed class ServerState : IDisposable
     public GgufFile? DraftGguf { get; set; }
 
     /// <summary>
-    /// Executes a request with sequential access control.
-    /// Only one request is processed at a time (Step 35 adds batching).
+    /// Holds a model lease for the complete request, including prompt conversion and streaming.
+    /// Batched requests overlap; legacy generators retain exclusive access.
     /// </summary>
     public async Task ExecuteAsync(Func<Task> work, CancellationToken ct)
     {
         await _requestGate.WaitAsync(ct);
+        if (_disposed) { _requestGate.Release(); throw new ObjectDisposedException(nameof(ServerState)); }
+        bool concurrent = Scheduler is not null;
+        lock (_drainLock)
+        {
+            if (_inflight++ == 0) _drained = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        }
+        if (concurrent) _requestGate.Release();
         try { await work(); }
-        finally { _requestGate.Release(); }
+        finally
+        {
+            lock (_drainLock)
+                if (--_inflight == 0) _drained!.TrySetResult();
+            if (!concurrent) _requestGate.Release();
+        }
+    }
+
+    private Task DrainAsync()
+    {
+        lock (_drainLock) return _inflight == 0 ? Task.CompletedTask : _drained!.Task;
+    }
+
+    /// <summary>Generates using the selected execution mode. Call within ExecuteAsync.</summary>
+    public Task<InferenceResponse> GenerateAsync(string prompt, InferenceOptions options, CancellationToken ct)
+        => Scheduler is { } scheduler
+            ? scheduler.EnqueueAsync(ToRequest(prompt, options), ct)
+            : Task.FromResult(Generator!.Generate(prompt, options));
+
+    /// <summary>Streams using the selected execution mode. Enumerate within ExecuteAsync.</summary>
+    public IAsyncEnumerable<GenerationToken> GenerateStreamingAsync(string prompt, InferenceOptions options, CancellationToken ct)
+        => Scheduler is { } scheduler
+            ? scheduler.GenerateStreamingAsync(ToRequest(prompt, options), ct)
+            : Generator!.GenerateStreamingTokensAsync(prompt, options, ct);
+
+    private InferenceRequest ToRequest(string prompt, InferenceOptions options)
+    {
+        int[] tokens = Tokenizer!.Encode(prompt);
+        return new InferenceRequest { TokenIds = tokens.Length == 0 ? [Tokenizer.BosTokenId] : tokens, Options = options };
     }
 
     /// <summary>
@@ -93,18 +139,26 @@ public sealed class ServerState : IDisposable
     public async Task SwapModelAsync(Func<Task> loadAction, CancellationToken ct)
     {
         await _requestGate.WaitAsync(ct);
-        IsReady = false;
         try
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            await DrainAsync();
+            IsReady = false;
+            if (Scheduler is not null) await Scheduler.DisposeAsync();
+            Scheduler = null;
+            Generator = null;
             PrefixCache?.Dispose();
             PrefixCache = null;
             PagedFactory?.Dispose();
             PagedFactory = null;
+            CudaPagedFactory?.Dispose();
+            CudaPagedFactory = null;
             DraftModel?.Dispose();
             DraftModel = null;
             DraftGguf?.Dispose();
             DraftGguf = null;
             Model?.Dispose();
+            Model = null;
             CurrentGguf?.Dispose();
             CurrentGguf = null;
 
@@ -117,13 +171,24 @@ public sealed class ServerState : IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        PrefixCache?.Dispose();
-        PagedFactory?.Dispose();
-        DraftModel?.Dispose();
-        DraftGguf?.Dispose();
-        Model?.Dispose();
-        CurrentGguf?.Dispose();
-        _requestGate.Dispose();
+        _requestGate.Wait();
+        try
+        {
+            if (_disposed) return;
+            _disposed = true;
+            IsReady = false;
+            // Abort queued/active inference on shutdown, then wait for HTTP leases to unwind.
+            Scheduler?.Dispose();
+            DrainAsync().GetAwaiter().GetResult();
+            PrefixCache?.Dispose();
+            PagedFactory?.Dispose();
+            CudaPagedFactory?.Dispose();
+            DraftModel?.Dispose();
+            DraftGguf?.Dispose();
+            Model?.Dispose();
+            CurrentGguf?.Dispose();
+        }
+        finally { _requestGate.Release(); }
     }
 }
 

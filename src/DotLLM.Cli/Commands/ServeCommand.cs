@@ -113,6 +113,26 @@ internal sealed class ServeCommand : AsyncCommand<ServeCommand.Settings>
         [DefaultValue(false)]
         public bool NoPaged { get; set; }
 
+        /// <summary>Enable continuous batching.</summary>
+        [CommandOption("--continuous-batching")]
+        [Description("Pack concurrent CPU or CUDA requests into shared forwards with paged KV.")]
+        public bool ContinuousBatching { get; set; }
+
+        /// <summary>Maximum active sequences.</summary>
+        [CommandOption("--max-sequences")]
+        [DefaultValue(8)]
+        public int MaxSequences { get; set; } = 8;
+
+        /// <summary>Token budget per forward.</summary>
+        [CommandOption("--max-batched-tokens")]
+        [DefaultValue(256)]
+        public int MaxBatchedTokens { get; set; } = 256;
+
+        /// <summary>Total token slots in the shared KV pool.</summary>
+        [CommandOption("--kv-cache-tokens")]
+        [DefaultValue(65536)]
+        public int KvCacheTokens { get; set; } = 65536;
+
         /// <summary>Draft model for speculative decoding.</summary>
         [CommandOption("--speculative-model")]
         [Description("Path or HuggingFace repo ID for a draft model. Enables speculative decoding for faster generation. Must share vocabulary with the main model.")]
@@ -148,6 +168,9 @@ internal sealed class ServeCommand : AsyncCommand<ServeCommand.Settings>
                 Iterations = settings.WarmupIterations,
             },
             UsePaged = !settings.NoPaged,
+            ContinuousBatching = settings.ContinuousBatching,
+            Batching = new() { MaxSequences = settings.MaxSequences, MaxBatchedTokens = settings.MaxBatchedTokens },
+            KvCacheTokens = settings.KvCacheTokens,
             SpeculativeModel = settings.SpeculativeModel,
             SpeculativeCandidates = settings.SpeculativeK,
             ModelId = "none",
@@ -200,7 +223,9 @@ internal sealed class ServeCommand : AsyncCommand<ServeCommand.Settings>
         AnsiConsole.MarkupLine($"  Listening on [link={url}]{url}[/]");
         if (!settings.NoUi)
             AnsiConsole.MarkupLine($"  Chat UI: [dim]{url}[/]");
-        AnsiConsole.MarkupLine("  [dim]Single-request mode — requests processed sequentially[/]");
+        AnsiConsole.MarkupLine(state.Scheduler is null
+            ? "  [dim]Single-request mode — requests processed sequentially[/]"
+            : $"  [dim]Continuous batching — up to {serverOptions.Batching.MaxSequences} active sequences[/]");
         AnsiConsole.MarkupLine("[dim]  Press Ctrl+C to stop.[/]");
         AnsiConsole.WriteLine();
 

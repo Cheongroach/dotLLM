@@ -46,6 +46,15 @@ public sealed record ServerOptions
     /// <summary>Whether to use paged KV-cache (block-based allocation). Default true for serve.</summary>
     public bool UsePaged { get; init; } = true;
 
+    /// <summary>Enable iteration-level continuous batching with an exclusive page pool.</summary>
+    public bool ContinuousBatching { get; init; }
+
+    /// <summary>Scheduler token, sequence, queue and stream limits.</summary>
+    public ContinuousBatchingOptions Batching { get; init; } = new();
+
+    /// <summary>Total KV token slots in the page pool (rounded up to whole blocks).</summary>
+    public int KvCacheTokens { get; init; } = 65536;
+
     /// <summary>Warm-up configuration for JIT pre-compilation and CUDA kernel loading.</summary>
     public WarmupOptions Warmup { get; init; } = WarmupOptions.Default;
 
@@ -76,6 +85,8 @@ public sealed record ServerOptions
         bool promptCacheEnabled = true;
         int promptCacheSize = 4;
         bool usePaged = true;
+        bool continuousBatching = false;
+        int maxSequences = 8, maxBatchedTokens = 256, kvCacheTokens = 65536;
         bool warmupEnabled = true;
         int warmupIterations = 3;
 
@@ -110,6 +121,14 @@ public sealed record ServerOptions
                     promptCacheEnabled = false; break;
                 case "--prompt-cache-size":
                     promptCacheSize = int.Parse(next!); i++; break;
+                case "--continuous-batching":
+                    continuousBatching = true; break;
+                case "--max-sequences":
+                    maxSequences = int.Parse(next!); i++; break;
+                case "--max-batched-tokens":
+                    maxBatchedTokens = int.Parse(next!); i++; break;
+                case "--kv-cache-tokens":
+                    kvCacheTokens = int.Parse(next!); i++; break;
                 case "--no-paged":
                     usePaged = false; break;
                 case "--warmup":
@@ -151,6 +170,9 @@ public sealed record ServerOptions
             PromptCacheEnabled = promptCacheEnabled,
             PromptCacheSize = promptCacheSize,
             UsePaged = usePaged,
+            ContinuousBatching = continuousBatching,
+            Batching = new() { MaxSequences = maxSequences, MaxBatchedTokens = maxBatchedTokens },
+            KvCacheTokens = kvCacheTokens,
             Warmup = new WarmupOptions
             {
                 Enabled = warmupEnabled,

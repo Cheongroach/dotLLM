@@ -18,7 +18,10 @@ public static class ChatCompletionEndpoint
     public static void Map(WebApplication app) =>
         app.MapPost("/v1/chat/completions", HandleAsync);
 
-    private static async Task HandleAsync(
+    private static Task HandleAsync(ChatCompletionRequest request, ServerState state, HttpContext httpContext)
+        => state.ExecuteAsync(() => HandleRequestAsync(request, state, httpContext), httpContext.RequestAborted);
+
+    private static async Task HandleRequestAsync(
         ChatCompletionRequest request,
         ServerState state,
         HttpContext httpContext)
@@ -50,7 +53,6 @@ public static class ChatCompletionEndpoint
         var ct = httpContext.RequestAborted;
         var requestId = RequestConverter.GenerateRequestId();
         var modelId = state.Options.ModelId;
-        var generator = state.Generator;
 
         // Convert DTOs to engine types
         var messages = RequestConverter.ToMessages(request.Messages);
@@ -90,16 +92,15 @@ public static class ChatCompletionEndpoint
         options = options with { MaxTokens = effectiveMaxTokens };
 
         if (request.Stream)
-            await HandleStreamingAsync(request, generator, state, httpContext, prompt, options,
+            await HandleStreamingAsync(request, state, httpContext, prompt, options,
                 requestId, modelId, tools, ct);
         else
-            await HandleNonStreamingAsync(request, generator, state, httpContext, prompt, options,
+            await HandleNonStreamingAsync(request, state, httpContext, prompt, options,
                 requestId, modelId, tools, ct);
     }
 
     private static async Task HandleNonStreamingAsync(
         ChatCompletionRequest request,
-        TextGenerator generator,
         ServerState state,
         HttpContext httpContext,
         string prompt,
@@ -108,12 +109,7 @@ public static class ChatCompletionEndpoint
         ToolDefinition[]? tools,
         CancellationToken ct)
     {
-        InferenceResponse? result = null;
-
-        await state.ExecuteAsync(async () =>
-        {
-            result = generator.Generate(prompt, options);
-        }, ct);
+        var result = await state.GenerateAsync(prompt, options, ct);
 
         // Detect tool calls
         string text = result!.Text;
@@ -176,7 +172,6 @@ public static class ChatCompletionEndpoint
 
     private static async Task HandleStreamingAsync(
         ChatCompletionRequest request,
-        TextGenerator generator,
         ServerState state,
         HttpContext httpContext,
         string prompt,
@@ -206,37 +201,35 @@ public static class ChatCompletionEndpoint
         InferenceTimings? timings = null;
         int completionTokens = 0;
 
-        await state.ExecuteAsync(async () =>
+        await foreach (var token in state.GenerateStreamingAsync(prompt, options, ct))
         {
-            await foreach (var token in generator.GenerateStreamingTokensAsync(prompt, options, ct))
+            if (token.Text.Length > 0 || token.Logprobs.HasValue)
             {
-                if (token.Text.Length > 0)
+                completionTokens++;
+                sb.Append(token.Text);
+                var tokenLogprobs = token.Logprobs.HasValue
+                    ? RequestConverter.ToLogprobsDto(token.Logprobs.Value)
+                    : null;
+                var contentChunk = new ChatCompletionChunk
                 {
-                    completionTokens++;
-                    sb.Append(token.Text);
-                    var tokenLogprobs = token.Logprobs.HasValue
-                        ? RequestConverter.ToLogprobsDto(token.Logprobs.Value)
-                        : null;
-                    var contentChunk = new ChatCompletionChunk
+                    Id = requestId,
+                    Model = modelId,
+                    Choices = [new ChatChunkChoiceDto
                     {
-                        Id = requestId,
-                        Model = modelId,
-                        Choices = [new ChatChunkChoiceDto
-                        {
-                            Delta = new ChatDeltaDto { Content = token.Text },
-                            Logprobs = tokenLogprobs,
-                        }],
-                    };
-                    await WriteSseChunk(httpContext, contentChunk, ct);
-                }
-
-                if (token.FinishReason.HasValue)
-                {
-                    finishReason = token.FinishReason.Value;
-                    timings = token.Timings;
-                }
+                        Delta = new ChatDeltaDto { Content = token.Text },
+                        Logprobs = tokenLogprobs,
+                    }],
+                };
+                await WriteSseChunk(httpContext, contentChunk, ct);
             }
-        }, ct);
+
+            if (token.FinishReason.HasValue)
+            {
+                finishReason = token.FinishReason.Value;
+                timings = token.Timings;
+                completionTokens = token.GeneratedTokenCount ?? completionTokens;
+            }
+        }
 
         // Detect tool calls in accumulated text
         string text = sb.ToString();

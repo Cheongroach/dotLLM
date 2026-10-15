@@ -59,6 +59,9 @@ public static class ModelManagementEndpoint
                     state.Tokenizer = newState.Tokenizer;
                     state.ChatTemplate = newState.ChatTemplate;
                     state.Generator = newState.Generator;
+                    state.Scheduler = newState.Scheduler;
+                    state.PagedFactory = newState.PagedFactory;
+                    state.CudaPagedFactory = newState.CudaPagedFactory;
                     state.ToolCallParser = newState.ToolCallParser;
                     state.KvCacheConfig = newState.KvCacheConfig;
                     state.KvCacheFactory = newState.KvCacheFactory;

@@ -14,7 +14,10 @@ public static class CompletionEndpoint
     public static void Map(WebApplication app) =>
         app.MapPost("/v1/completions", HandleAsync);
 
-    private static async Task HandleAsync(
+    private static Task HandleAsync(CompletionRequest request, ServerState state, HttpContext httpContext)
+        => state.ExecuteAsync(() => HandleRequestAsync(request, state, httpContext), httpContext.RequestAborted);
+
+    private static async Task HandleRequestAsync(
         CompletionRequest request,
         ServerState state,
         HttpContext httpContext)
@@ -46,7 +49,6 @@ public static class CompletionEndpoint
         var ct = httpContext.RequestAborted;
         var requestId = RequestConverter.GenerateRequestId();
         var modelId = state.Options.ModelId;
-        var generator = state.Generator;
 
         // Validate prompt length against model context
         int maxTokens = request.MaxTokens ?? state.SamplingDefaults.MaxTokens;
@@ -71,23 +73,19 @@ public static class CompletionEndpoint
         options = options with { MaxTokens = effectiveMaxTokens };
 
         if (request.Stream)
-            await HandleStreamingAsync(generator, state, httpContext, request.Prompt, options,
+            await HandleStreamingAsync(state, httpContext, request.Prompt, options,
                 requestId, modelId, ct);
         else
-            await HandleNonStreamingAsync(generator, state, httpContext, request.Prompt, options,
+            await HandleNonStreamingAsync(state, httpContext, request.Prompt, options,
                 requestId, modelId, ct);
     }
 
     private static async Task HandleNonStreamingAsync(
-        TextGenerator generator, ServerState state, HttpContext httpContext,
+        ServerState state, HttpContext httpContext,
         string prompt, DotLLM.Core.Configuration.InferenceOptions options,
         string requestId, string modelId, CancellationToken ct)
     {
-        InferenceResponse? result = null;
-        await state.ExecuteAsync(async () =>
-        {
-            result = generator.Generate(prompt, options);
-        }, ct);
+        var result = await state.GenerateAsync(prompt, options, ct);
 
         var logprobsDto = result!.Logprobs is { Length: > 0 }
             ? RequestConverter.ToLogprobsDto(result.Logprobs)
@@ -117,7 +115,7 @@ public static class CompletionEndpoint
     }
 
     private static async Task HandleStreamingAsync(
-        TextGenerator generator, ServerState state, HttpContext httpContext,
+        ServerState state, HttpContext httpContext,
         string prompt, DotLLM.Core.Configuration.InferenceOptions options,
         string requestId, string modelId, CancellationToken ct)
     {
@@ -125,32 +123,29 @@ public static class CompletionEndpoint
         httpContext.Response.Headers.CacheControl = "no-cache";
         httpContext.Response.Headers.Connection = "keep-alive";
 
-        await state.ExecuteAsync(async () =>
+        await foreach (var token in state.GenerateStreamingAsync(prompt, options, ct))
         {
-            await foreach (var token in generator.GenerateStreamingTokensAsync(prompt, options, ct))
+            var tokenLogprobs = token.Logprobs.HasValue
+                ? RequestConverter.ToLogprobsDto(token.Logprobs.Value)
+                : null;
+            var chunk = new CompletionChunk
             {
-                var tokenLogprobs = token.Logprobs.HasValue
-                    ? RequestConverter.ToLogprobsDto(token.Logprobs.Value)
-                    : null;
-                var chunk = new CompletionChunk
+                Id = requestId,
+                Model = modelId,
+                Choices = [new CompletionChunkChoiceDto
                 {
-                    Id = requestId,
-                    Model = modelId,
-                    Choices = [new CompletionChunkChoiceDto
-                    {
-                        Text = token.Text,
-                        Logprobs = tokenLogprobs,
-                        FinishReason = token.FinishReason.HasValue
-                            ? RequestConverter.ToFinishReasonString(token.FinishReason.Value)
-                            : null,
-                    }],
-                };
-                await httpContext.Response.WriteAsync("data: ", ct);
-                await JsonSerializer.SerializeAsync(httpContext.Response.Body, chunk, ServerJsonContext.Default.CompletionChunk, ct);
-                await httpContext.Response.WriteAsync("\n\n", ct);
-                await httpContext.Response.Body.FlushAsync(ct);
-            }
-        }, ct);
+                    Text = token.Text,
+                    Logprobs = tokenLogprobs,
+                    FinishReason = token.FinishReason.HasValue
+                        ? RequestConverter.ToFinishReasonString(token.FinishReason.Value)
+                        : null,
+                }],
+            };
+            await httpContext.Response.WriteAsync("data: ", ct);
+            await JsonSerializer.SerializeAsync(httpContext.Response.Body, chunk, ServerJsonContext.Default.CompletionChunk, ct);
+            await httpContext.Response.WriteAsync("\n\n", ct);
+            await httpContext.Response.Body.FlushAsync(ct);
+        }
 
         await httpContext.Response.WriteAsync("data: [DONE]\n\n", ct);
         await httpContext.Response.Body.FlushAsync(ct);

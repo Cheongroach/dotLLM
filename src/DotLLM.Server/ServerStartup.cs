@@ -65,152 +65,201 @@ public static class ServerStartup
     /// </summary>
     public static ServerState LoadModel(string resolvedPath, ServerOptions options)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(options.KvCacheTokens);
+        if (options.ContinuousBatching) options.Batching.Validate();
+        var requestedKv = new KvCacheConfig(KvCacheConfig.ParseDType(options.CacheTypeK), KvCacheConfig.ParseDType(options.CacheTypeV));
+        if (options.ContinuousBatching && (!options.UsePaged || requestedKv.IsQuantized ||
+            !string.IsNullOrEmpty(options.SpeculativeModel)))
+            throw new NotSupportedException("Continuous batching requires paged unquantized KV and no speculative draft model.");
         Console.WriteLine($"[dotllm] Loading model from {resolvedPath}...");
         var gguf = GgufFile.Open(resolvedPath);
-        var config = GgufModelConfigExtractor.Extract(gguf.Metadata);
-        var tokenizer = GgufBpeTokenizerFactory.Load(gguf.Metadata);
-
-        var threading = new ThreadingConfig(options.Threads, options.DecodeThreads);
-
-        int gpuLayers = options.GpuLayers.HasValue
-            ? Math.Clamp(options.GpuLayers.Value, 0, config.NumLayers)
-            : options.Device.StartsWith("gpu", StringComparison.OrdinalIgnoreCase) ? config.NumLayers : 0;
-
-        IModel model;
-        if (gpuLayers <= 0)
-        {
-            Console.WriteLine($"[dotllm] CPU inference ({threading.EffectiveThreadCount} threads)");
-            model = TransformerModel.LoadFromGguf(gguf, config, threading);
-        }
-        else if (gpuLayers >= config.NumLayers)
-        {
-            int gpuId = ParseGpuId(options.Device);
-            Console.WriteLine($"[dotllm] GPU {gpuId} inference");
-            model = DotLLM.Cuda.CudaTransformerModel.LoadFromGguf(gguf, config, gpuId);
-        }
-        else
-        {
-            int gpuId = ParseGpuId(options.Device);
-            Console.WriteLine($"[dotllm] Hybrid inference ({gpuLayers} GPU + {config.NumLayers - gpuLayers} CPU layers)");
-            model = DotLLM.Cuda.HybridTransformerModel.LoadFromGguf(gguf, config, gpuLayers, gpuId, threading);
-        }
-
-        // Create chat template
-        string bosToken = tokenizer.DecodeToken(tokenizer.BosTokenId);
-        string eosToken = tokenizer.DecodeToken(tokenizer.EosTokenId);
-        IChatTemplate chatTemplate = GgufChatTemplateFactory.TryCreate(gguf.Metadata, tokenizer)
-            ?? new JinjaChatTemplate(
-                "{% for message in messages %}" +
-                "{{'<|im_start|>' + message['role'] + '\\n' + message['content'] + '<|im_end|>' + '\\n'}}" +
-                "{% endfor %}" +
-                "{% if add_generation_prompt %}{{ '<|im_start|>assistant\\n' }}{% endif %}",
-                bosToken, eosToken);
-
-        // Tool call parser
-        var toolCallParser = GgufChatTemplateFactory.CreateToolCallParser(gguf.Metadata, config.Architecture);
-
-        // KV-cache configuration
-        var kvConfig = new KvCacheConfig(
-            KvCacheConfig.ParseDType(options.CacheTypeK),
-            KvCacheConfig.ParseDType(options.CacheTypeV));
-
-        Func<ModelConfig, int, IKvCache>? kvFactory = null;
-        PagedKvCacheFactory? pagedFactory = null;
-        if (model is DotLLM.Cuda.CudaTransformerModel cudaModel)
-        {
-            if (options.UsePaged)
-                Console.WriteLine("[dotllm] Paged KV-cache not supported with CUDA, using GPU cache.");
-            kvFactory = kvConfig.IsQuantized
-                ? (cfg, size) => cudaModel.CreateKvCache(size, kvConfig)
-                : (cfg, size) => cudaModel.CreateKvCache(size);
-        }
-        else if (model is DotLLM.Cuda.HybridTransformerModel hybridModel)
-        {
-            if (options.UsePaged)
-                Console.WriteLine("[dotllm] Paged KV-cache not supported with hybrid GPU, using hybrid cache.");
-            kvFactory = (cfg, size) => hybridModel.CreateKvCache(size);
-        }
-        else if (options.UsePaged && !kvConfig.IsQuantized)
-        {
-            pagedFactory = new PagedKvCacheFactory(
-                config.NumLayers, config.NumKvHeads, config.HeadDim);
-            kvFactory = (cfg, size) => pagedFactory.Create(size);
-            Console.WriteLine("[dotllm] Using paged KV-cache (block-based allocation)");
-        }
-        else if (options.UsePaged && kvConfig.IsQuantized)
-        {
-            Console.WriteLine("[dotllm] Paged KV-cache does not support quantization yet, using quantized simple cache.");
-            kvFactory = (cfg, size) => new QuantizedKvCache(
-                cfg.NumLayers, cfg.NumKvHeads, cfg.HeadDim, size,
-                kvConfig.KeyDType, kvConfig.ValueDType, kvConfig.MixedPrecisionWindowSize);
-        }
-        else if (kvConfig.IsQuantized)
-        {
-            kvFactory = (cfg, size) => new QuantizedKvCache(
-                cfg.NumLayers, cfg.NumKvHeads, cfg.HeadDim, size,
-                kvConfig.KeyDType, kvConfig.ValueDType, kvConfig.MixedPrecisionWindowSize);
-        }
-
-        PrefixCache? prefixCache = options.PromptCacheEnabled
-            ? new PrefixCache(options.PromptCacheSize)
-            : null;
-
-        // Load speculative draft model if configured
-        IModel? draftModel = null;
+        IModel? model = null, draftModel = null;
         GgufFile? draftGguf = null;
-        string draftModelPath = "";
-        if (!string.IsNullOrEmpty(options.SpeculativeModel))
+        PagedKvCacheFactory? pagedFactory = null;
+        DotLLM.Cuda.CudaPagedKvCacheFactory? cudaPagedFactory = null;
+        PrefixCache? prefixCache = null;
+        ContinuousBatchScheduler? scheduler = null;
+        try
         {
-            var draftPath = ResolveModelPath(options.SpeculativeModel, null);
-            if (draftPath is null)
-                throw new InvalidOperationException($"Speculative draft model not found: {options.SpeculativeModel}");
+            var config = GgufModelConfigExtractor.Extract(gguf.Metadata);
+            var tokenizer = GgufBpeTokenizerFactory.Load(gguf.Metadata);
 
-            draftGguf = GgufFile.Open(draftPath);
-            var draftConfig = GgufModelConfigExtractor.Extract(draftGguf.Metadata);
-            if (!SpeculativeConstants.AreVocabsCompatible(config.VocabSize, draftConfig.VocabSize))
+            var threading = new ThreadingConfig(options.Threads, options.DecodeThreads);
+
+            int gpuLayers = options.GpuLayers.HasValue
+                ? Math.Clamp(options.GpuLayers.Value, 0, config.NumLayers)
+                : options.Device.StartsWith("gpu", StringComparison.OrdinalIgnoreCase) ? config.NumLayers : 0;
+
+            if (options.ContinuousBatching && gpuLayers > 0 && gpuLayers < config.NumLayers)
             {
-                draftGguf.Dispose();
-                throw new InvalidOperationException(
-                    $"Draft model vocab size ({draftConfig.VocabSize}) differs from target ({config.VocabSize}) " +
-                    $"by more than {SpeculativeConstants.MaxVocabSizeDifference} tokens. " +
-                    "Models must share the same base tokenizer.");
+                gguf.Dispose();
+                throw new NotSupportedException("Continuous batching supports CPU or full CUDA offload; hybrid offload is not supported.");
             }
-            if (draftConfig.VocabSize != config.VocabSize)
-                Console.WriteLine($"[dotllm] Note: vocab sizes differ slightly ({draftConfig.VocabSize} vs {config.VocabSize}) — using shared range for speculative comparison.");
 
-            var draftThreading = new ThreadingConfig(options.Threads, options.DecodeThreads);
-            draftModel = TransformerModel.LoadFromGguf(draftGguf, draftConfig, draftThreading);
-            draftModelPath = draftPath;
-            Console.WriteLine($"[dotllm] Speculative decoding: draft={Path.GetFileName(draftPath)}, K={options.SpeculativeCandidates}");
+            if (gpuLayers <= 0)
+            {
+                Console.WriteLine($"[dotllm] CPU inference ({threading.EffectiveThreadCount} threads)");
+                model = TransformerModel.LoadFromGguf(gguf, config, threading);
+            }
+            else if (gpuLayers >= config.NumLayers)
+            {
+                int gpuId = ParseGpuId(options.Device);
+                Console.WriteLine($"[dotllm] GPU {gpuId} inference");
+                model = DotLLM.Cuda.CudaTransformerModel.LoadFromGguf(gguf, config, gpuId);
+            }
+            else
+            {
+                int gpuId = ParseGpuId(options.Device);
+                Console.WriteLine($"[dotllm] Hybrid inference ({gpuLayers} GPU + {config.NumLayers - gpuLayers} CPU layers)");
+                model = DotLLM.Cuda.HybridTransformerModel.LoadFromGguf(gguf, config, gpuLayers, gpuId, threading);
+            }
+
+            // Create chat template
+            string bosToken = tokenizer.DecodeToken(tokenizer.BosTokenId);
+            string eosToken = tokenizer.DecodeToken(tokenizer.EosTokenId);
+            IChatTemplate chatTemplate = GgufChatTemplateFactory.TryCreate(gguf.Metadata, tokenizer)
+                ?? new JinjaChatTemplate(
+                    "{% for message in messages %}" +
+                    "{{'<|im_start|>' + message['role'] + '\\n' + message['content'] + '<|im_end|>' + '\\n'}}" +
+                    "{% endfor %}" +
+                    "{% if add_generation_prompt %}{{ '<|im_start|>assistant\\n' }}{% endif %}",
+                    bosToken, eosToken);
+
+            // Tool call parser
+            var toolCallParser = GgufChatTemplateFactory.CreateToolCallParser(gguf.Metadata, config.Architecture);
+
+            // KV-cache configuration
+            var kvConfig = new KvCacheConfig(
+                KvCacheConfig.ParseDType(options.CacheTypeK),
+                KvCacheConfig.ParseDType(options.CacheTypeV));
+
+            Func<ModelConfig, int, IKvCache>? kvFactory = null;
+            if (model is DotLLM.Cuda.CudaTransformerModel cudaModel)
+            {
+                if (options.UsePaged && !kvConfig.IsQuantized)
+                {
+                    cudaPagedFactory = cudaModel.CreatePagedKvCacheFactory(options.KvCacheTokens);
+                    kvFactory = (cfg, size) => cudaPagedFactory.Create(size);
+                    Console.WriteLine("[dotllm] Using FP16 GPU paged KV-cache");
+                }
+                else
+                {
+                    kvFactory = kvConfig.IsQuantized
+                        ? (cfg, size) => cudaModel.CreateKvCache(size, kvConfig)
+                        : (cfg, size) => cudaModel.CreateKvCache(size);
+                }
+            }
+            else if (model is DotLLM.Cuda.HybridTransformerModel hybridModel)
+            {
+                if (options.UsePaged)
+                    Console.WriteLine("[dotllm] Paged KV-cache not supported with hybrid GPU, using hybrid cache.");
+                kvFactory = (cfg, size) => hybridModel.CreateKvCache(size);
+            }
+            else if (options.UsePaged && !kvConfig.IsQuantized)
+            {
+                pagedFactory = new PagedKvCacheFactory(
+                    config.NumLayers, config.NumKvHeads, config.HeadDim, maxTotalTokens: options.KvCacheTokens);
+                kvFactory = (cfg, size) => pagedFactory.Create(size);
+                Console.WriteLine("[dotllm] Using paged KV-cache (block-based allocation)");
+            }
+            else if (options.UsePaged && kvConfig.IsQuantized)
+            {
+                Console.WriteLine("[dotllm] Paged KV-cache does not support quantization yet, using quantized simple cache.");
+                kvFactory = (cfg, size) => new QuantizedKvCache(
+                    cfg.NumLayers, cfg.NumKvHeads, cfg.HeadDim, size,
+                    kvConfig.KeyDType, kvConfig.ValueDType, kvConfig.MixedPrecisionWindowSize);
+            }
+            else if (kvConfig.IsQuantized)
+            {
+                kvFactory = (cfg, size) => new QuantizedKvCache(
+                    cfg.NumLayers, cfg.NumKvHeads, cfg.HeadDim, size,
+                    kvConfig.KeyDType, kvConfig.ValueDType, kvConfig.MixedPrecisionWindowSize);
+            }
+
+            prefixCache = options.PromptCacheEnabled && !options.ContinuousBatching
+                ? new PrefixCache(options.PromptCacheSize)
+                : null;
+
+            // Load speculative draft model if configured
+            string draftModelPath = "";
+            if (!string.IsNullOrEmpty(options.SpeculativeModel))
+            {
+                var draftPath = ResolveModelPath(options.SpeculativeModel, null);
+                if (draftPath is null)
+                    throw new InvalidOperationException($"Speculative draft model not found: {options.SpeculativeModel}");
+
+                draftGguf = GgufFile.Open(draftPath);
+                var draftConfig = GgufModelConfigExtractor.Extract(draftGguf.Metadata);
+                if (!SpeculativeConstants.AreVocabsCompatible(config.VocabSize, draftConfig.VocabSize))
+                {
+                    draftGguf.Dispose();
+                    throw new InvalidOperationException(
+                        $"Draft model vocab size ({draftConfig.VocabSize}) differs from target ({config.VocabSize}) " +
+                        $"by more than {SpeculativeConstants.MaxVocabSizeDifference} tokens. " +
+                        "Models must share the same base tokenizer.");
+                }
+                if (draftConfig.VocabSize != config.VocabSize)
+                    Console.WriteLine($"[dotllm] Note: vocab sizes differ slightly ({draftConfig.VocabSize} vs {config.VocabSize}) — using shared range for speculative comparison.");
+
+                var draftThreading = new ThreadingConfig(options.Threads, options.DecodeThreads);
+                draftModel = TransformerModel.LoadFromGguf(draftGguf, draftConfig, draftThreading);
+                draftModelPath = draftPath;
+                Console.WriteLine($"[dotllm] Speculative decoding: draft={Path.GetFileName(draftPath)}, K={options.SpeculativeCandidates}");
+            }
+
+            var generator = new TextGenerator(model, tokenizer, kvFactory, prefixCache,
+                draftModel: draftModel, speculativeCandidates: options.SpeculativeCandidates);
+
+            // Warm-up: JIT pre-compilation + CUDA kernel loading
+            WarmupRunner.Run(generator, tokenizer, options.Warmup);
+            prefixCache?.Clear(); // Discard warm-up KV-cache entries
+
+            if (options.ContinuousBatching)
+            {
+                scheduler = cudaPagedFactory is { } gpuPages
+                    ? new ContinuousBatchScheduler((IBatchedModel)model, tokenizer, gpuPages.Create,
+                        gpuPages.BlockSize, gpuPages.TotalBlocks, options.Batching)
+                    : new ContinuousBatchScheduler((IBatchedModel)model, tokenizer, pagedFactory!, options.Batching);
+                _ = scheduler.RunLoopAsync(CancellationToken.None);
+                Console.WriteLine($"[dotllm] Continuous batching: {options.Batching.MaxSequences} sequences, " +
+                    $"{options.Batching.MaxBatchedTokens} tokens/forward; prefix reuse disabled.");
+            }
+
+            return new ServerState
+            {
+                Options = options,
+                Config = config,
+                ToolCallParser = toolCallParser,
+                KvCacheConfig = kvConfig,
+                KvCacheFactory = kvFactory,
+                PagedFactory = pagedFactory,
+                CudaPagedFactory = cudaPagedFactory,
+                PrefixCache = prefixCache,
+                IsReady = true,
+                Model = model,
+                Tokenizer = tokenizer,
+                ChatTemplate = chatTemplate,
+                Generator = generator,
+                Scheduler = scheduler,
+                LoadedModelPath = resolvedPath,
+                CurrentGguf = gguf,
+                DraftModel = draftModel,
+                DraftModelPath = draftModelPath,
+                DraftGguf = draftGguf,
+            };
         }
-
-        var generator = new TextGenerator(model, tokenizer, kvFactory, prefixCache,
-            draftModel: draftModel, speculativeCandidates: options.SpeculativeCandidates);
-
-        // Warm-up: JIT pre-compilation + CUDA kernel loading
-        WarmupRunner.Run(generator, tokenizer, options.Warmup);
-        prefixCache?.Clear(); // Discard warm-up KV-cache entries
-
-        return new ServerState
+        catch
         {
-            Options = options,
-            Config = config,
-            ToolCallParser = toolCallParser,
-            KvCacheConfig = kvConfig,
-            KvCacheFactory = kvFactory,
-            PagedFactory = pagedFactory,
-            PrefixCache = prefixCache,
-            IsReady = true,
-            Model = model,
-            Tokenizer = tokenizer,
-            ChatTemplate = chatTemplate,
-            Generator = generator,
-            LoadedModelPath = resolvedPath,
-            CurrentGguf = gguf,
-            DraftModel = draftModel,
-            DraftModelPath = draftModelPath,
-            DraftGguf = draftGguf,
-        };
+            scheduler?.Dispose();
+            prefixCache?.Dispose();
+            pagedFactory?.Dispose();
+            cudaPagedFactory?.Dispose();
+            draftModel?.Dispose();
+            draftGguf?.Dispose();
+            model?.Dispose();
+            gguf.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
