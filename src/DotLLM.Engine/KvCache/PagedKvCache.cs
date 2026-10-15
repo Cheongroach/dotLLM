@@ -11,7 +11,7 @@ namespace DotLLM.Engine.KvCache;
 /// Attention kernel compatibility is maintained via staging buffers that gather blocks into
 /// contiguous views for <see cref="GetKeysRef"/>/<see cref="GetValuesRef"/>.
 /// </summary>
-public sealed unsafe class PagedKvCache : IKvCache
+public sealed unsafe class PagedKvCache : IPagedKvCache
 {
     private readonly KvBlockPool _pool;
     private readonly KvBlockTable _blockTable;
@@ -20,8 +20,8 @@ public sealed unsafe class PagedKvCache : IKvCache
     private readonly int _maxSeqLen;
 
     // Pre-allocated staging buffers for contiguous view (reused across GetKeysRef/GetValuesRef calls)
-    private readonly nint _keyStagingPtr;
-    private readonly nint _valueStagingPtr;
+    private nint _keyStagingPtr;
+    private nint _valueStagingPtr;
     private readonly long _stagingBytes;
 
     private bool _disposed;
@@ -31,6 +31,45 @@ public sealed unsafe class PagedKvCache : IKvCache
 
     /// <inheritdoc/>
     public int MaxLength => _maxSeqLen;
+
+    /// <inheritdoc/>
+    public int BlockSize => _pool.BlockSize;
+
+    /// <inheritdoc/>
+    public int KvStride => _kvStride;
+
+    /// <inheritdoc/>
+    public ReadOnlySpan<int> BlockIds => _blockTable.BlockIds;
+
+    /// <summary>Physical bytes assigned to this sequence, including optional staging.</summary>
+    public long AllocatedBytes => (long)BlockIds.Length * BlockSize * KvStride * _numLayers * 2 * sizeof(float) + StagingBytes;
+
+    /// <summary>Bytes in optional legacy contiguous staging buffers.</summary>
+    public long StagingBytes => (_keyStagingPtr == 0 ? 0 : _stagingBytes) +
+                                (_valueStagingPtr == 0 ? 0 : _stagingBytes);
+
+    /// <inheritdoc/>
+    public TensorRef GetKeyBlocksRef(int layerIndex)
+    {
+        ValidateLayer(layerIndex);
+        return new TensorRef(checked(_pool.TotalBlocks * BlockSize), _kvStride,
+            DType.Float32, -1, (nint)_pool.GetKeyPtr(0, layerIndex));
+    }
+
+    /// <inheritdoc/>
+    public TensorRef GetValueBlocksRef(int layerIndex)
+    {
+        ValidateLayer(layerIndex);
+        return new TensorRef(checked(_pool.TotalBlocks * BlockSize), _kvStride,
+            DType.Float32, -1, (nint)_pool.GetValuePtr(0, layerIndex));
+    }
+
+    private void ValidateLayer(int layerIndex)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if ((uint)layerIndex >= (uint)_numLayers)
+            throw new ArgumentOutOfRangeException(nameof(layerIndex));
+    }
 
     /// <summary>The block table mapping logical positions to physical blocks.</summary>
     internal KvBlockTable BlockTable => _blockTable;
@@ -44,22 +83,30 @@ public sealed unsafe class PagedKvCache : IKvCache
     /// <param name="maxSeqLen">Maximum sequence length this cache can hold.</param>
     public PagedKvCache(KvBlockPool pool, int numLayers, int kvStride, int maxSeqLen)
     {
+        ArgumentNullException.ThrowIfNull(pool);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxSeqLen);
+        if (numLayers != pool.NumLayers || kvStride != pool.KvStride)
+            throw new ArgumentException("Cache geometry must match the block pool.", nameof(pool));
         _pool = pool;
         _numLayers = numLayers;
         _kvStride = kvStride;
         _maxSeqLen = maxSeqLen;
         _blockTable = new KvBlockTable(pool);
 
-        // Pre-allocate staging buffers (one per K and V, sized for maxSeqLen)
-        _stagingBytes = (long)maxSeqLen * kvStride * sizeof(float);
-        _keyStagingPtr = (nint)NativeMemory.AlignedAlloc((nuint)_stagingBytes, 64);
-        _valueStagingPtr = (nint)NativeMemory.AlignedAlloc((nuint)_stagingBytes, 64);
+        // Legacy contiguous access allocates staging lazily. Direct paged attention never needs it.
+        _stagingBytes = checked((long)maxSeqLen * kvStride * sizeof(float));
     }
 
     /// <inheritdoc/>
     public void Update(TensorRef keys, TensorRef values, ReadOnlySpan<int> positions, int layerIndex)
     {
+        ValidateLayer(layerIndex);
         int seqLen = positions.Length;
+        if (keys.DType != DType.Float32 || values.DType != DType.Float32 ||
+            keys.DeviceId != -1 || values.DeviceId != -1 ||
+            keys.Dim0 != seqLen || values.Dim0 != seqLen ||
+            keys.Dim1 != _kvStride || values.Dim1 != _kvStride)
+            throw new ArgumentException("Expected CPU Float32 [tokens, kvStride] projections.");
         if (seqLen == 0) return;
 
         int maxPos = _blockTable.CurrentLength - 1;
@@ -127,7 +174,7 @@ public sealed unsafe class PagedKvCache : IKvCache
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TensorRef GetKeysRef(int layerIndex)
     {
-        GatherIntoStaging(_keyStagingPtr, layerIndex, isKey: true);
+        GatherIntoStaging(ref _keyStagingPtr, layerIndex, isKey: true);
         return new TensorRef(_blockTable.CurrentLength, _kvStride, DType.Float32, -1, _keyStagingPtr);
     }
 
@@ -135,14 +182,14 @@ public sealed unsafe class PagedKvCache : IKvCache
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TensorRef GetValuesRef(int layerIndex)
     {
-        GatherIntoStaging(_valueStagingPtr, layerIndex, isKey: false);
+        GatherIntoStaging(ref _valueStagingPtr, layerIndex, isKey: false);
         return new TensorRef(_blockTable.CurrentLength, _kvStride, DType.Float32, -1, _valueStagingPtr);
     }
 
     /// <inheritdoc/>
     public ITensor GetKeys(int layerIndex)
     {
-        GatherIntoStaging(_keyStagingPtr, layerIndex, isKey: true);
+        GatherIntoStaging(ref _keyStagingPtr, layerIndex, isKey: true);
         var shape = new TensorShape(_blockTable.CurrentLength, _kvStride);
         return new TensorView(shape, DType.Float32, -1, _keyStagingPtr);
     }
@@ -150,7 +197,7 @@ public sealed unsafe class PagedKvCache : IKvCache
     /// <inheritdoc/>
     public ITensor GetValues(int layerIndex)
     {
-        GatherIntoStaging(_valueStagingPtr, layerIndex, isKey: false);
+        GatherIntoStaging(ref _valueStagingPtr, layerIndex, isKey: false);
         var shape = new TensorShape(_blockTable.CurrentLength, _kvStride);
         return new TensorView(shape, DType.Float32, -1, _valueStagingPtr);
     }
@@ -178,8 +225,14 @@ public sealed unsafe class PagedKvCache : IKvCache
     /// Gathers block data into a contiguous staging buffer for attention kernel consumption.
     /// Copies block-by-block in logical order.
     /// </summary>
-    private void GatherIntoStaging(nint stagingPtr, int layerIndex, bool isKey)
+    private void GatherIntoStaging(ref nint stagingPtr, int layerIndex, bool isKey)
     {
+        ValidateLayer(layerIndex);
+        if (stagingPtr == 0)
+        {
+            stagingPtr = (nint)NativeMemory.AlignedAlloc((nuint)_stagingBytes, 64);
+            if (stagingPtr == 0) throw new OutOfMemoryException();
+        }
         int currentLength = _blockTable.CurrentLength;
         if (currentLength == 0) return;
 

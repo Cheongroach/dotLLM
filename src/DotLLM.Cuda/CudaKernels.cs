@@ -81,6 +81,9 @@ public sealed unsafe class CudaKernels : IDisposable
     private readonly nint _dequantQ4_KFunc;
     private readonly nint _dequantQ5_KFunc;
     private readonly nint _dequantQ6_KFunc;
+    private readonly CudaModule? _pagedAttentionModule;
+    private readonly nint _pagedAttentionFunc;
+    private readonly nint _scatterPagedKvFunc;
     private readonly CudaModule? _quantKvModule;
     private readonly nint _quantKvQ8_0Func;
     private readonly nint _quantKvQ4_0Func;
@@ -154,6 +157,14 @@ public sealed unsafe class CudaKernels : IDisposable
         _dequantQ4_KFunc = _dequantModule.GetFunction("dequant_q4_k_f16");
         _dequantQ5_KFunc = _dequantModule.GetFunction("dequant_q5_k_f16");
         _dequantQ6_KFunc = _dequantModule.GetFunction("dequant_q6_k_f16");
+
+        string pagedPath = Path.Combine(ptxDir, "paged_attention.ptx");
+        if (File.Exists(pagedPath))
+        {
+            _pagedAttentionModule = CudaModule.LoadFromFile(pagedPath);
+            _pagedAttentionFunc = _pagedAttentionModule.GetFunction("paged_attention_f16");
+            _scatterPagedKvFunc = _pagedAttentionModule.GetFunction("scatter_paged_kv_f16");
+        }
 
         // KV-cache quantization (optional — PTX may not be compiled yet)
         string quantKvPath = Path.Combine(ptxDir, "quant_kv.ptx");
@@ -495,6 +506,37 @@ public sealed unsafe class CudaKernels : IDisposable
                 sharedBytes, stream, (nint)args, 0).ThrowOnError();
     }
 
+    /// <summary>Writes new FP16 projections directly into pages, without copying the cached prefix.</summary>
+    public void LaunchScatterPagedKv(nint keys, nint values, nint keyPool, nint valuePool,
+        nint pageTable, int pageSize, int rows, int stride, int position, nint stream)
+    {
+        RequirePagedAttention();
+        void** args = stackalloc void*[] { &keys, &values, &keyPool, &valuePool,
+            &pageTable, &pageSize, &rows, &stride, &position };
+        uint grid = (uint)Math.Min(((long)rows * stride + BlockSize - 1) / BlockSize, 65535);
+        CudaDriverApi.cuLaunchKernel(_scatterPagedKvFunc, grid, 1, 1, BlockSize, 1, 1,
+            0, stream, (nint)args, 0).ThrowOnError();
+    }
+
+    /// <summary>Online softmax over a sequence's non-contiguous GPU KV pages. Supports causal GQA and SWA.</summary>
+    public void LaunchPagedAttention(nint q, nint keyPool, nint valuePool, nint output,
+        nint pageTable, int pageSize, int seqQ, int seqKv, int numHeads, int numKvHeads,
+        int headDim, int positionOffset, int slidingWindow, nint stream)
+    {
+        RequirePagedAttention();
+        void** args = stackalloc void*[] { &q, &keyPool, &valuePool, &output, &pageTable,
+            &pageSize, &seqQ, &seqKv, &numHeads, &numKvHeads, &headDim, &positionOffset, &slidingWindow };
+        uint sharedBytes = (uint)((2 * headDim + 256 + 32) * sizeof(float));
+        CudaDriverApi.cuLaunchKernel(_pagedAttentionFunc, (uint)(seqQ * numHeads), 1, 1,
+            BlockSize, 1, 1, sharedBytes, stream, (nint)args, 0).ThrowOnError();
+    }
+
+    internal void RequirePagedAttention()
+    {
+        if (_pagedAttentionModule is null)
+            throw new InvalidOperationException("Compile native/kernels/paged_attention.cu to PTX before enabling GPU paged attention.");
+    }
+
     /// <summary>Bias add: output[t, :] += bias[:]. half2 vectorized (2 elements/thread).</summary>
     public void LaunchBiasAdd(nint output, nint bias, int dim, int seqLen, nint stream)
     {
@@ -753,5 +795,6 @@ public sealed unsafe class CudaKernels : IDisposable
         _rmsnormF32Module.Dispose();
         _quantizedGemvF32InModule.Dispose();
         _quantKvModule?.Dispose();
+        _pagedAttentionModule?.Dispose();
     }
 }
