@@ -206,6 +206,19 @@ public sealed unsafe class ComputeThreadPoolTests
     /// Helper: dispatches work that sums an array of 1.0f values across all threads.
     /// Returns the computed sum (should equal arraySize when each element is 1.0f).
     /// </summary>
+    [Theory]
+    [InlineData(DispatchMode.EventBased)]
+    [InlineData(DispatchMode.SpinWait)]
+    public void ImmediateFirstDispatch_WorksBeforeWorkersHaveStarted(DispatchMode mode)
+    {
+        for (int iteration = 0; iteration < 40; iteration++)
+        {
+            using var pool = new ComputeThreadPool(4);
+            pool.SetDispatchMode(mode);
+            Assert.Equal(64, RunSumWork(pool, 64));
+        }
+    }
+
     private static int RunSumWork(ComputeThreadPool pool, int arraySize)
     {
         float* data = (float*)NativeMemory.AlignedAlloc((nuint)(arraySize * sizeof(float)), 64);
