@@ -40,7 +40,7 @@ dotLLM is a ground-up LLM inference engine for .NET — not a wrapper around lla
 - **Paged KV-cache** — PagedAttention with block-level allocation, prefix caching, and copy-on-write
 - **Speculative decoding** — draft-verify-accept with KV-cache rollback (greedy mode today; non-greedy planned — see issue #121)
 - **Structured output** — FSM/PDA-based constrained decoding guaranteeing valid JSON, JSON Schema, regex, and grammar
-- **(Planned) Continuous batching** — iteration-level scheduling with preemption and priority queuing — Phase 9, see [Roadmap](#roadmap)
+- **Continuous batching** — opt-in CPU/CUDA packed forwards, chunked prefill, capacity-aware admission and request isolation; see [Scheduling](docs/SCHEDULING.md). Active preemption and cross-request prefix sharing remain planned.
 
 ### Extensibility
 - **Pluggable backends** — `IBackend` interface with separate packages per backend (CPU, CUDA, ROCm)
@@ -275,6 +275,8 @@ History cleared.
 ```
 
 ### Serve — OpenAI-compatible API + chat UI
+
+For concurrent serving, add `--continuous-batching --max-sequences 4 --max-batched-tokens 128 --kv-cache-tokens 4096`. Supports CPU or `--device gpu:0`; see [supported modes and benchmarks](docs/SCHEDULING.md).
 
 Starts a local HTTP server exposing an OpenAI-compatible API (`/v1/chat/completions`, `/v1/completions`, `/v1/models`, `/v1/tokenize`, streaming SSE, tool calling) plus a built-in single-page web chat UI. Paged KV-cache, prompt caching, and startup warm-up are on by default. The browser opens automatically unless `--no-browser` is set.
 
@@ -721,6 +723,7 @@ Both modes transparently reuse the embedded chat UI assets if `serveUi: true`. T
 
 - **2026-04** — **First public release (v0.1.0-preview.1)** — dotLLM goes public. [NuGet packages](#nuget-packages) for all 10 libraries + `DotLLM.Cli` as a global `dotnet tool`. Self-contained single-file downloads for Windows / Linux / macOS (Apple Silicon) and experimental Native AOT builds for Linux / Windows attached to every [GitHub Release](https://github.com/kkokosa/dotLLM/releases). Companion website at [dotllm.dev](https://dotllm.dev/) ([#119](https://github.com/kkokosa/dotLLM/issues/119))
 - **2026-04** — **Wave 7**: CPU performance cleanup pass — `TopKSampler` replaces full `Array.Sort` with a hand-rolled size-K min-heap (`O(N log K)`, stack-resident scratch); `JsonSchemaConstraint` adds first-char bucketing to skip the ~160 MB of struct clones per mask build when the tracker rejects most leading characters, plus LRU eviction instead of the previous full-flush cache overflow; `Dequantize.Q5_0` gains an AVX2 path matching Q8_0's throughput (reuses `MatMulQ5_0.ExtractQ5HighBits` / `vpshufb` bit-extraction); `BpeTokenizer` pre-splits special tokens via the existing `Trie.TryMatchLongest` instead of the O(n × m) linear scan; `ComputeThreadPool` now pins the caller (inference) thread to the first candidate P-core on first `Dispatch`, eliminating the hybrid-CPU stall where pinned P-core workers idled at the barrier waiting for an E-core caller. New BenchmarkDotNet suites for TopK sampling, schema mask build, and special-token encode ([#109](https://github.com/kkokosa/dotLLM/issues/109))
+- **2026-09** — Continuous batching and direct CPU/CUDA PagedAttention: shared projections, independent request pages, chunked prefill, bounded streaming and deterministic reclamation. Opt in with `--continuous-batching`; advanced preemption and prefix sharing remain future work.
 - **2026-04** — **Phase 7 begins**: Logprobs — OpenAI-compatible `logprobs: true` + `top_logprobs: N` (0-20) on `/v1/chat/completions` and `/v1/completions`. Per-token log-softmax captured before sampling, returned in both streaming SSE chunks and non-streaming responses. Chat UI gains opt-in logprobs visualization: color-coded token confidence (green/lime/yellow/orange/red), hover tooltips with top-K alternatives and probabilities, diagnostic cues for low confidence, ambiguity, and sampling effect. `DotLLM.Sample.Logprobs` console sample with ANSI-colored output ([#101](https://github.com/kkokosa/dotLLM/issues/101))
 - **2026-04** — **Phase 6 complete**: Speculative decoding — draft-verify-accept loop with modified rejection sampling. A small draft model proposes K candidate tokens; the target model verifies in one batched forward pass. Greedy fast-path for temperature=0. `IKvCache.Rollback()` for KV-cache truncation on rejection. `IDecodingConstraint.Clone()` for constraint rollback. Serve UI gains draft model selector and K slider. `--speculative-model` and `--speculative-k` CLI options. Speculative acceptance rate in response timings ([#98](https://github.com/kkokosa/dotLLM/issues/98))
 - **2026-04** — Paged KV-cache — block-based KV-cache memory management (the allocation half of PagedAttention): shared block pool, block tables, ref counting, copy-on-write. Foundation for advanced prefix sharing (step 37, hard requirement) and speculative decoding (step 43, cheap rollback/fork). Attention kernels still operate on contiguous buffers via staging-buffer gather — true paged attention kernels are a future step. `--paged` (opt-in for CLI), on by default for `serve`. `--no-ui` flag for API-only hosting. See [docs/KV_CACHE.md](docs/KV_CACHE.md) ([#96](https://github.com/kkokosa/dotLLM/issues/96))
@@ -769,8 +772,8 @@ Both modes transparently reuse the embedded chat UI assets if `serveUi: true`. T
 | **5 — Constrained Decoding & API** | JSON mode, JSON Schema, regex/CFG, tool calling, OpenAI API server, chat UI, prompt caching | Done (7/7) |
 | **6 — Improved Serving** | Warm-up, NativeAOT, paged KV-cache, speculative decoding | Done (4/4) |
 | **7 — Diagnostics & Interpretability** | Logprobs, hook system, logit lens, SAE integration, LoRA adapters | In Progress (1/5) |
-| **8 — Model Expansion** | MLA attention, ALiBi, SmolLM3, Gemma 4, Mixture of Experts | Planned (0/5) |
-| **9 — Production Serving** | Continuous batching, prefix sharing, advanced scheduling, rate limiting, metrics & tracing | Planned (0/5) |
+| **8 — Model Expansion** | MLA attention, ALiBi, SmolLM3, Gemma 4, Mixture of Experts | In progress (1/5) |
+| **9 — Production Serving** | Continuous batching, prefix sharing, advanced scheduling, rate limiting, metrics & tracing | In progress (1/5) |
 
 See [docs/ROADMAP.md](docs/ROADMAP.md) for detailed steps, dependencies, and milestones.
 

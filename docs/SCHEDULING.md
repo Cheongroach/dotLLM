@@ -1,89 +1,100 @@
 # Scheduling & Continuous Batching — dotLLM
 
-## Overview
+`ContinuousBatchScheduler` owns model compute and request KV caches. Multiple requests
+share each `IBatchedModel.ForwardBatch` call: projections and FFNs operate on packed
+rows, while attention reads only the corresponding request's pages. No padding or
+cross-request attention is introduced. CPU and full CUDA offload are supported.
 
-The scheduler operates at **iteration granularity**, not request granularity. This enables continuous batching: as sequences finish, new ones are admitted immediately, keeping the hardware batch always full.
+## Enable serving
 
-## IScheduler Interface
-
-```
-IScheduler:
-  Enqueue(request: InferenceRequest) → Task<InferenceResponse>
-  RunLoop(cancellation) → Task    // Main scheduling loop
-  GetMetrics() → SchedulerMetrics
-```
-
-## Iteration-Level Scheduling
-
-Each scheduler iteration:
-
-1. **Check completions**: Sequences hitting EOS/max tokens/stop conditions → evict, free KV blocks.
-2. **Admit new requests**: Fill freed capacity from the priority queue.
-3. **Prefill**: For newly admitted sequences, process full prompt tokens (batch prefill).
-4. **Decode**: For all active sequences, generate one token each (batched decode).
-
-```
-while (!cancelled):
-  completed = batch.RemoveCompleted()
-  FreeKvBlocks(completed)
-  NotifyClients(completed)
-
-  admitted = AdmitFromQueue(available_kv_blocks)
-  RunPrefill(admitted)
-
-  tokens = RunDecode(batch.ActiveSequences)
-  ApplySamplerPipeline(tokens)
-  CheckStopConditions(tokens)
-  StreamTokensToClients(tokens)
+```bash
+dotllm serve model.gguf --continuous-batching --max-sequences 4 --max-batched-tokens 128 --kv-cache-tokens 4096
+dotllm serve model.gguf --device gpu:0 --continuous-batching --max-sequences 4 --max-batched-tokens 128 --kv-cache-tokens 4096
 ```
 
-## Prefill/Decode Separation
+The mode is opt-in. Both completions endpoints use it, for regular JSON responses
+and SSE streaming. Model swaps block new requests and drain existing HTTP leases
+before stopping the scheduler and disposing its pool/model. Shutdown cancels work
+and waits for leases to unwind. GPU paged kernels must be compiled and deployed
+alongside the existing PTX files (`native/kernels/paged_attention.cu`).
 
-Different compute characteristics:
-- **Prefill**: Process N prompt tokens. Compute-bound (GEMM). High arithmetic intensity.
-- **Decode**: Process 1 token per sequence. Memory-bandwidth-bound (GEMV). Low arithmetic intensity.
+The model supports one compute owner; do not run `TextGenerator` or another forward
+concurrently with the scheduler. Dispose in order: scheduler, page pool, model.
 
-The scheduler can separate these into micro-batches within one iteration for optimal utilization. Prefill benefits from large batch GEMM; decode benefits from batching many sequences together.
+## Iteration policy
 
-## Request Priority
+1. Drain arrivals and cancel queued/active requests, returning their pages.
+2. Admit by priority, FIFO within a priority, up to `MaxSequences` and the reserved
+   page budget. A capacity waiter is not bypassed by a smaller request of equal priority.
+3. Give every decoding request one token slot. `MaxBatchedTokens > MaxSequences`
+   guarantees space for them.
+4. Fill remaining slots with prompt chunks up to `PrefillChunkSize`, rotating the
+   first prompt considered each iteration. Prefill and decode may share one forward.
+5. Sample only completed prompt chunks and decode rows. Each request owns its RNG,
+   constraint clone, token history, output stream and KV cache.
+6. Finish EOS, stop, context-limit and max-token requests, reclaim their pages, then
+   admit more requests on the next iteration.
 
-Each request carries a priority level (from API key or explicit parameter):
+A request reserves `ceil(capacity / blockSize)` logical pages at admission, where
+`capacity = min(contextLimit, promptTokens + max(0, maxTokens - 1))`. This covers
+its worst-case cached length; the final generated token does not need a KV slot.
+Physical page IDs are assigned as the cache grows. Reservation is conservative:
+unused output budgets can reduce concurrency. The pool's underlying storage is a
+fixed allocation; releasing page IDs makes that storage reusable, not smaller.
 
-| Level | Behavior |
-|-------|----------|
-| `critical` | Never preempted, admitted first |
-| `high` | Preempts `normal` and `low` |
-| `normal` | Default |
-| `low` | Preempted first, admitted last |
+`MaxTokens = 0` returns without a forward. A full context can still produce one
+next-token prediction. Requests too large for the pool and invalid inputs fail at
+submission. A bounded waiting queue rejects overload instead of growing indefinitely.
 
-Priority affects:
-- **Queue ordering**: Higher priority → admitted sooner.
-- **Preemption**: When memory scarce, lower-priority sequences preempted first.
+## Streaming and failures
 
-## Preemption
+`GenerateStreamingAsync` uses a bounded per-request channel. A consumer that falls
+behind its `StreamBufferCapacity` fails its own request; it cannot block shared
+compute. Disposing enumeration cancels that request and waits for KV release.
+Stop-string prefixes are withheld until resolved, including stops spanning tokens
+or ending inside a token. The terminal event reports `GeneratedTokenCount` so EOS
+and zero-token responses are counted correctly.
 
-When KV-cache memory is exhausted and high-priority requests arrive:
+Sampling/constraint errors affect one request. A forward failure stops the loop
+and fails every outstanding request; GPU work is synchronized before page reuse.
+Custom sampler steps, logit processors and stop conditions must be immutable or
+owned by a single request. Constraints are cloned by the scheduler.
 
-1. Select lowest-priority active sequences.
-2. **Swap out**: Save their KV-cache blocks to CPU memory (or mark for recomputation).
-3. Free GPU KV blocks for the new request.
-4. Later: when capacity returns, **swap in**: restore KV blocks and resume.
+## Scope
 
-Swap options:
-- **Recompute**: Discard KV, re-prefill when resuming. Simple, no CPU memory needed.
-- **CPU offload**: Copy KV blocks to CPU memory. Faster resume but uses CPU RAM.
+- CPU uses Float32 pages and direct SIMD page reads; CUDA uses Float16 pages,
+  device page tables, a scatter kernel for new KV and tiled online softmax.
+- Weight quantization remains supported. Quantized **KV**, hybrid CPU/GPU models,
+  speculative draft models and per-request adapters are unsupported in this mode.
+- Prefix reuse is disabled while batching. CPU block refcounts/CoW remain available
+  separately, but automatic cross-request prefix sharing is not implemented.
+- Priority controls waiting-queue admission only. There is no active preemption,
+  swap/recompute, priority aging, distributed prefill/decode, or CUDA graph capture.
+- Attention launches are per sequence/layer; the shared projection work is batched.
+  Further GPU kernel fusion and batching-aware quantized GEMM are performance work.
+- Timing fields in individual responses sum the shared iterations in which that
+  request participated. They are not exclusive per-request compute costs. Measure
+  end-to-end TTFT/ITL separately, including queueing.
 
-## Sequence State Machine
+## Tests and benchmarks
 
+```bash
+dotnet test tests/DotLLM.Tests.Unit -c Release
+dotnet test tests/DotLLM.Tests.Integration -c Release --filter 'FullyQualifiedName~ContinuousBatchingIntegrationTests|FullyQualifiedName~PagedKvCacheIntegrationTests'
+DOTLLM_GPU_TEST_MODEL=/path/model.gguf dotnet test tests/DotLLM.Tests.Unit -c Release --filter 'FullyQualifiedName~CudaPagedAttentionTests|FullyQualifiedName~CudaContinuousBatchingTests'
+
+# MODEL BACKEND CONCURRENCY REQUESTS MAX_TOKENS ARRIVAL_MS CPU_THREADS
+# Runs the same trace with max_sequences=1, then CONCURRENCY; emits JSON lines.
+dotnet run --project benchmarks/DotLLM.Benchmarks -c Release -- --continuous /path/model.gguf cpu 4 16 32 0 4
+dotnet run --project benchmarks/DotLLM.Benchmarks -c Release -- --continuous /path/model.gguf gpu 4 16 32 10 4
+
+# Kernel-only comparison: historical gather+attention vs direct page reads.
+dotnet run --project benchmarks/DotLLM.Benchmarks -c Release -- --filter '*PagedAttentionBenchmarks*'
 ```
-QUEUED → PREFILLING → DECODING → COMPLETED
-                ↕                    ↓
-           PREEMPTED ←──────── (memory pressure)
-```
 
-## Scheduling Policies
-
-The `IScheduler` interface allows different policies:
-- **FCFS with priority**: Default. Priority queue ordered by (priority, arrival_time).
-- **Shortest-job-first**: Estimate remaining tokens, prioritize short generations.
-- **Fair-share**: Balance token throughput across API keys/users.
+The trace benchmark records warm-up-excluded throughput, TTFT/ITL percentiles,
+actual sequence rows per forward and page reclamation. Its single-sequence baseline
+uses the same scheduler/paged kernel with admission limited to one request, isolating
+the batching effect. More requests can improve throughput/queueing while increasing
+individual decode latency; evaluate both. The kernel benchmark includes the legacy
+attention math as well as gather cost, so its ratio does not isolate copying alone.

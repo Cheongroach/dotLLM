@@ -24,7 +24,7 @@ Simple indexing: `K_cache[layer][head][pos] = new_K`. Wastes memory for short se
 
 ## Paged KV-Cache
 
-Inspired by OS virtual memory paging. This is the **memory management** half of PagedAttention (vLLM): block-based allocation, ref counting, CoW. The **kernel** half (attention reading non-contiguous blocks directly) is a future step — current kernels see contiguous buffers via staging-buffer gather.
+Inspired by OS virtual memory paging: logical token blocks map to shared physical pages. CPU and full CUDA models read these pages directly during attention. CPU block tables also support reference counting and copy-on-write; CUDA tables currently provide exclusive request ownership.
 
 ### Why
 
@@ -35,7 +35,7 @@ Inspired by OS virtual memory paging. This is the **memory management** half of 
 - **Step 43 (speculative decoding)** — benefits from cheap block-level rollback on draft rejection and CoW fork for draft branching, though `SimpleKvCache.SetCurrentLength()` truncation works as a fallback.
 - **Beam search** (future) — beams share prefix blocks via `Fork`, diverge via CoW.
 
-**When it doesn't help**: Single-sequence CLI inference. One sequence uses most of its allocation, and the staging-buffer gather adds overhead. This is why paged is opt-in for `run`/`chat` and default-on only for `serve`.
+**Tradeoff**: A fixed pool reserves memory up front. For a single short request, a smaller contiguous cache may be more appropriate. Paging is opt-in for CPU `run`/`chat` and default-on for `serve`; use `--kv-cache-tokens` to size the serving pool.
 
 ### Design
 - Divide cache into fixed-size **blocks** of B tokens (B = 16).
@@ -49,18 +49,30 @@ Inspired by OS virtual memory paging. This is the **memory management** half of 
 - **Copy-on-write**: For beam search — beams share prefix blocks (ref-counted). On divergence, copy the shared block.
 - **Fork**: For prompt caching — new sequence references existing prefix blocks.
 
-### Attention Integration (v1: Staging Buffer)
+### Direct PagedAttention
 
-Current implementation uses a staging buffer approach: `GetKeysRef()`/`GetValuesRef()` gather block data into a pre-allocated contiguous buffer before each attention call. This avoids modifying attention kernels. The gather cost is O(seqLen × headDim) — negligible compared to attention's O(seqLen² × headDim).
+CPU `PagedAttention.Execute` obtains physical layer buffers and block IDs from
+`IPagedKvCache`. A token at position `t` resolves to
+`(blockIds[t / B] * B + t % B) * kvStride`. Bounded score tiles and online softmax
+avoid both a full score matrix and a contiguous copy of the cached prefix.
+GQA/MQA/MHA, causal masking, partial pages and sliding windows are supported.
 
-Future optimization: specialized paged attention kernels that read blocks directly via block table indirection, eliminating the staging copy.
+CUDA uses `CudaPagedKvCacheFactory` to allocate shared Float16 layer buffers and
+`CudaPagedKvCache` for each sequence's device table. The scatter kernel appends
+new projections; `paged_attention_f16` reads the physical pages directly with FP32
+accumulation. GPU work finishes before caches may release or reuse pages.
+
+CPU `GetKeysRef` / `GetValuesRef` retain lazy staging for legacy callers. The model's
+paged path never calls them. During one-token decode, gathering the full prefix is
+linear in context length, just like attention itself; eliminating it saves memory
+traffic, but speedup depends on kernel math, memory layout and workload.
 
 ### Key Classes
 
-- `KvBlockPool` — Fixed-size pool of KV blocks. Per-layer contiguous storage, 64-byte aligned. Free list with `Interlocked` ref counting for thread safety.
-- `KvBlockTable` — Per-sequence mapping from logical positions to physical block IDs. Supports `Fork` (shared prefix) and `EnsureWritable` (copy-on-write).
-- `PagedKvCache : IKvCache` — Paged cache with staging-buffer gather. Drop-in replacement for `SimpleKvCache`.
-- `PagedKvCacheFactory` — Creates `PagedKvCache` instances backed by a shared `KvBlockPool`.
+- `KvBlockPool`, `KvBlockTable`: CPU storage, page allocation, refcounts and CoW.
+- `PagedKvCache : IPagedKvCache`, `PagedKvCacheFactory`: CPU request views and shared pool.
+- `CudaPagedKvCache`, `CudaPagedKvCacheFactory`: GPU request tables and shared Float16 pool.
+- `ContinuousBatchScheduler`: exclusive cache ownership and conservative admission reservations.
 
 ### CLI
 
@@ -76,11 +88,12 @@ dotllm serve model.gguf --no-paged      # simple KV-cache
 dotllm serve model.gguf --no-ui
 ```
 
-### Limitations (v1)
+### Limitations
 
-- CPU `PagedKvCache` only. CUDA and hybrid models fall back to their native KV-cache.
+- CPU and full CUDA serving support direct pages. Hybrid offload uses its original cache. CUDA paged caches do not support fork/CoW yet.
 - Not compatible with quantized KV-cache (`--cache-type-k`/`--cache-type-v`). Falls back to `QuantizedKvCache` with a warning.
-- Staging buffer means `GetKeysRef`/`GetValuesRef` results are only valid until the next call (shared buffer).
+- CPU legacy staging views are only valid until the next gather into that buffer; CUDA contiguous view methods are unsupported.
+- Continuous batching disables prefix reuse and rejects quantized KV. See [SCHEDULING.md](SCHEDULING.md) for supported modes and pool sizing.
 
 ## KV-Cache Quantization
 
