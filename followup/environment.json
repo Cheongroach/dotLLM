@@ -1,0 +1,30 @@
+{
+  "cuda": {
+    "gpu": "NVIDIA H20",
+    "reportedMemoryMiB": 97871,
+    "driverKernel": "535.161.08",
+    "driverUserModeCompatibility": "590.48.01 (CUDA compatibility library)",
+    "cublas": "nvidia-cublas-cu12==12.1.3.1",
+    "nsys": "2025.5.2",
+    "ncu": "2025.4.0 (installed; no counter collection in this experiment)",
+    "cpuQuotaCores": 2,
+    "memoryLimitGiB": 16,
+    "architecture": "x86_64",
+    "compute": "Q8_0 quantized GEMV decode; scratch dequantization to FP16 then cuBLAS prefill; FP16 activations/KV; FP32 logits"
+  },
+  "ascend": {
+    "gpu": "Ascend 910B4 64 GB",
+    "cann": "8.3.RC1",
+    "cpuQuotaCores": 2,
+    "memoryLimitGiB": 16,
+    "compute": "FP32 expanded weights and math; FP16 KV and RoPE tables",
+    "resultsSource": "../docs/ascend-results/20261024",
+    "followupProfiling": "COMPLETED: actual msprof device tasks, ACL/runtime API, PipeUtilization export",
+    "followupCgroup": "v1: cpu quota/period=200000/100000 us; memory limit=17179869184 B"
+  },
+  "notes": [
+    "Same model bytes and prompts, different hosts and precision paths.",
+    "cuBLAS 13 attempt returned NOT_INITIALIZED; tested explicit cuBLAS 12 library path.",
+    "Older kernel driver alone rejected bundled PTX 8.5; compatibility library enabled it."
+  ]
+}

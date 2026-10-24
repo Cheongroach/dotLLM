@@ -1,0 +1,27 @@
+{
+  "temporaryTests": [
+    {
+      "label": "ascend",
+      "runStatus": "done",
+      "pods": [
+        {
+          "status": 4,
+          "stopAt": "2026-10-24T04:14:30.000Z",
+          "active": false
+        }
+      ]
+    },
+    {
+      "label": "cuda",
+      "runStatus": "done",
+      "pods": [
+        {
+          "status": 4,
+          "stopAt": "2026-10-24T04:14:05.000Z",
+          "active": false
+        }
+      ]
+    }
+  ],
+  "previousHlDevbox": "Retained as previously requested; not part of this cleanup."
+}

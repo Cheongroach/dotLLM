@@ -1,0 +1,30 @@
+{
+  "implementationCommit": "93010f3e6208a58fdeb27c174b0ca6d2f876250e",
+  "models": {
+    "SmolLM-135M.Q8_0.gguf": "7d4afa1d8a5587f4beb8b75dab755f90d13d3ae2b8b9f148545b414ecfb9123a",
+    "qwen2.5-0.5b-instruct-q8_0.gguf": "ca59ca7f13d0e15a8cfa77bd17e65d24f6844b554a7b6c12e07a5f89ff76844e"
+  },
+  "harnessSources": {
+    "tests/DotLLM.Tests.BackendComparison/run-comparison.sh": "ed799001760c86f3c293365fad066a9ffd5aa448fe9f00c5ada5eb1ac8b2f335",
+    "tests/DotLLM.Tests.BackendComparison/Program.cs": "9017d00377e853cf6355e7637ff690df712627ea733cd0bd5d8aa9107df8bc33",
+    "tests/DotLLM.Tests.BackendComparison/README.md": "a037926d4134049cb8e8460acf81c064771534bbe631e3d2135555b7be7c6dbc",
+    "tests/DotLLM.Tests.BackendComparison/DotLLM.Tests.BackendComparison.csproj": "a1803eaf1bad4278592d06f74cdc047853433d12d74387c594bd14523d8d445d"
+  },
+  "binaries": {
+    "DotLLM.Tokenizers.dll": "48281ee720ac42a1bcad73acb08351fbee78d99203be93cb000ad767a065cbdb",
+    "DotLLM.Core.dll": "90b35d637102b026c730e93eba3faa75b12e70f3d60b034e26b1109e2ce7afb5",
+    "DotLLM.Models.dll": "986230dc44d9d2a9c9c1e59f23e7b4f4bf0d3b58d8286c50ed2dc2b58e51c6e9",
+    "DotLLM.Tests.BackendComparison.dll": "38b1bddb776b832010552c88724c4c7f2431c0969ea4f99850027b8f7b1ade03",
+    "DotLLM.Cpu.dll": "f283ed4b631e005527141bd127029804fc9d438c780a3ef63a26416935644241",
+    "DotLLM.Engine.dll": "befc1ccb76a5e29ba1699b988b39f9f1c0325cc0cd79ee2f6b97f89a5201657e",
+    "System.Numerics.Tensors.dll": "6f8c8ec580c4f036403e2bca76310680d0de82c029a3f7618f65af06323d631e",
+    "DotLLM.Ascend.dll": "f176b30659f8a5b49f5716f65d6dcd7d6532843322fe2a5e7beed34737328a16",
+    "DotLLM.Cuda.dll": "f9ed47cb38c308ee96801377f7ce79dc7d3917dec56975495cfaf364989d6c12"
+  },
+  "rawProfileSha256": "9a0a283dedeac9e3b74e836e0650c6a31e4ae17bd31d7bdb673fa23d2d39b224",
+  "rawProfilesPublished": false,
+  "traceExport": "Allowlisted CUDA timing events only; excludes process environment and machine identifiers.",
+  "ascendNativeSha256": "9d00adc5d58b994e29b92d931672c15941ab3140228e5b89b2feb30048ce5bca",
+  "ascendFollowupNote": "Rebuilt bridge hash matches original 910B4 full suite",
+  "harnessCommit": "baad25999035d1ac57ef03d4dea02872b99e827c"
+}

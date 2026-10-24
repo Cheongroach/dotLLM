@@ -1,0 +1,328 @@
+{
+  "device": "Ascend 910B4",
+  "cann": "8.3.RC1",
+  "tool": "MindStudio Profiler (msprof)",
+  "model": "SmolLM-135M.Q8_0.gguf",
+  "workload": "one warm cached 32-token prefill plus eight forced decode steps",
+  "intervalMs": 1585.1483999999998,
+  "deviceTaskSumMs": 114.90655400000453,
+  "deviceTaskBusyUnionMs": 114.90655400000453,
+  "deviceTaskBusyFraction": 0.07248946155451726,
+  "ops": [
+    {
+      "name": "MemSet",
+      "calls": 6759,
+      "totalMs": 37.8017939999998,
+      "meanUs": 5.592808699511734,
+      "sharePercent": 32.89785715791139
+    },
+    {
+      "name": "MatMulV2",
+      "calls": 6759,
+      "totalMs": 22.66019000000401,
+      "meanUs": 3.352595058441191,
+      "sharePercent": 19.72053743775409
+    },
+    {
+      "name": "Transpose",
+      "calls": 2430,
+      "totalMs": 21.098896000001464,
+      "meanUs": 8.682673251029408,
+      "sharePercent": 18.361786395578996
+    },
+    {
+      "name": "Slice",
+      "calls": 5130,
+      "totalMs": 9.804782000007584,
+      "meanUs": 1.911263547759763,
+      "sharePercent": 8.532830947142665
+    },
+    {
+      "name": "SoftmaxV2",
+      "calls": 2430,
+      "totalMs": 7.786135999995629,
+      "meanUs": 3.2041711934138393,
+      "sharePercent": 6.776059092325859
+    },
+    {
+      "name": "Add",
+      "calls": 2970,
+      "totalMs": 4.215779999996626,
+      "meanUs": 1.4194545454534095,
+      "sharePercent": 3.6688768858184195
+    },
+    {
+      "name": "Mul",
+      "calls": 2700,
+      "totalMs": 3.8215699999932293,
+      "meanUs": 1.4153962962937887,
+      "sharePercent": 3.3258068116750583
+    },
+    {
+      "name": "Cast",
+      "calls": 2160,
+      "totalMs": 3.149608000002483,
+      "meanUs": 1.4581518518530014,
+      "sharePercent": 2.7410168440020914
+    },
+    {
+      "name": "RmsNorm",
+      "calls": 549,
+      "totalMs": 2.2465100000004212,
+      "meanUs": 4.092003642988017,
+      "sharePercent": 1.9550755999525777
+    },
+    {
+      "name": "RotaryPositionEmbedding",
+      "calls": 540,
+      "totalMs": 1.7939480000027705,
+      "meanUs": 3.322125925931057,
+      "sharePercent": 1.5612233920118255
+    },
+    {
+      "name": "Swish",
+      "calls": 270,
+      "totalMs": 0.5273400000005058,
+      "meanUs": 1.9531111111129846,
+      "sharePercent": 0.458929435827033
+    }
+  ],
+  "aclApi": [
+    {
+      "name": "aclrtMemcpy",
+      "calls": 29866,
+      "totalMs": 526.1833479999976
+    },
+    {
+      "name": "aclnnMatmul",
+      "calls": 6759,
+      "totalMs": 294.25825900000217
+    },
+    {
+      "name": "aclrtSynchronizeStream",
+      "calls": 18378,
+      "totalMs": 200.39262200001792
+    },
+    {
+      "name": "aclnnMatmulGetWorkspaceSize",
+      "calls": 6759,
+      "totalMs": 117.74385000000798
+    },
+    {
+      "name": "MatMulV2_Tiling",
+      "calls": 6759,
+      "totalMs": 47.867166999996755
+    },
+    {
+      "name": "aclnnAdd",
+      "calls": 2970,
+      "totalMs": 40.43878299999896
+    },
+    {
+      "name": "aclrtMalloc",
+      "calls": 14621,
+      "totalMs": 39.63976599999735
+    },
+    {
+      "name": "aclnnMuls",
+      "calls": 2430,
+      "totalMs": 38.18546700000091
+    },
+    {
+      "name": "aclrtFree",
+      "calls": 14621,
+      "totalMs": 33.43243399999367
+    },
+    {
+      "name": "aclnnCast",
+      "calls": 2160,
+      "totalMs": 27.604791000001132
+    },
+    {
+      "name": "aclnnSoftmax",
+      "calls": 2430,
+      "totalMs": 25.40942300000012
+    },
+    {
+      "name": "aclnnSoftmaxGetWorkspaceSize",
+      "calls": 2430,
+      "totalMs": 21.963439999996023
+    },
+    {
+      "name": "Slice_Tiling",
+      "calls": 5130,
+      "totalMs": 17.141016000004004
+    },
+    {
+      "name": "Mul_Tiling",
+      "calls": 2700,
+      "totalMs": 14.233262999999537
+    },
+    {
+      "name": "aclnnMulsGetWorkspaceSize",
+      "calls": 2430,
+      "totalMs": 13.843044000008424
+    },
+    {
+      "name": "aclnnAddGetWorkspaceSize",
+      "calls": 2970,
+      "totalMs": 13.768100000003317
+    },
+    {
+      "name": "Add_Tiling",
+      "calls": 2970,
+      "totalMs": 11.101377999995137
+    },
+    {
+      "name": "aclnnCastGetWorkspaceSize",
+      "calls": 2160,
+      "totalMs": 9.907526999996515
+    },
+    {
+      "name": "SoftmaxV2_Tiling",
+      "calls": 4860,
+      "totalMs": 9.390496000009392
+    },
+    {
+      "name": "aclrtSetCurrentContext",
+      "calls": 5288,
+      "totalMs": 7.2312290000081
+    },
+    {
+      "name": "Cast_Tiling",
+      "calls": 2160,
+      "totalMs": 5.6731290000020635
+    },
+    {
+      "name": "Transpose_Tiling",
+      "calls": 4860,
+      "totalMs": 4.520161000003212
+    },
+    {
+      "name": "aclnnSilu",
+      "calls": 270,
+      "totalMs": 4.462524000000758
+    },
+    {
+      "name": "aclnnRmsNorm",
+      "calls": 549,
+      "totalMs": 4.455769999999429
+    },
+    {
+      "name": "aclnnInnerRotaryPositionEmbedding",
+      "calls": 540,
+      "totalMs": 4.356516999998145
+    },
+    {
+      "name": "aclnnMul",
+      "calls": 270,
+      "totalMs": 3.9459720000000487
+    },
+    {
+      "name": "aclnnRmsNormGetWorkspaceSize",
+      "calls": 549,
+      "totalMs": 2.138511000001966
+    },
+    {
+      "name": "aclnnMulGetWorkspaceSize",
+      "calls": 270,
+      "totalMs": 1.5471210000007922
+    },
+    {
+      "name": "aclnnInnerRotaryPositionEmbeddingGetWorkspaceSize",
+      "calls": 540,
+      "totalMs": 1.537890000001109
+    },
+    {
+      "name": "Swish_Tiling",
+      "calls": 270,
+      "totalMs": 1.4939580000010246
+    },
+    {
+      "name": "aclnnSiluGetWorkspaceSize",
+      "calls": 270,
+      "totalMs": 1.4057309999980716
+    },
+    {
+      "name": "aclnnInnerRotaryPositionEmbeddingTiling",
+      "calls": 2,
+      "totalMs": 0.10176999999996042
+    }
+  ],
+  "phases": [
+    {
+      "test": "profile_phase",
+      "phase": "prefill_begin",
+      "utc": "2026-10-24T04:08:52.9780075+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "prefill_end",
+      "elapsedMs": 512.3152,
+      "utc": "2026-10-24T04:08:53.4972082+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 0,
+      "elapsedMs": 129.9384,
+      "utc": "2026-10-24T04:08:53.6287105+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 1,
+      "elapsedMs": 121.6181,
+      "utc": "2026-10-24T04:08:53.7522786+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 2,
+      "elapsedMs": 166.13,
+      "utc": "2026-10-24T04:08:53.9184938+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 3,
+      "elapsedMs": 120.7356,
+      "utc": "2026-10-24T04:08:54.0393118+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 4,
+      "elapsedMs": 153.7622,
+      "utc": "2026-10-24T04:08:54.1931512+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 5,
+      "elapsedMs": 120.4373,
+      "utc": "2026-10-24T04:08:54.3136698+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 6,
+      "elapsedMs": 120.3094,
+      "utc": "2026-10-24T04:08:54.4340555+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 7,
+      "elapsedMs": 129.0295,
+      "utc": "2026-10-24T04:08:54.5631559+00:00"
+    }
+  ],
+  "rawTraceSha256": "43129778f3da05cb3a6fbde1ec0eced1b68e5e5f3e46d5e0076f5caafe80ba72",
+  "limitations": [
+    "ACL API durations include nested calls and device waits; not additive.",
+    "Device-task busy fraction excludes standalone copy activity and is not AICore utilization.",
+    "One profiled run; profiler overhead and logging are included in wall time.",
+    "Counter groups are per-task PipeUtilization; no HBM bandwidth roofline measured."
+  ]
+}

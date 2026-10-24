@@ -1,7 +1,9 @@
 # Ascend implementation research and experiment archive
 
-This branch contains documentation, sanitized visible conversation text and experiment evidence only. The runnable implementation is on [ascend/910b4-dense-baseline](https://github.com/Cheongroach/dotLLM/tree/ascend/910b4-dense-baseline).
+This branch contains documentation, sanitized visible conversation text, experiment evidence and evidence-export helpers. The runnable inference implementation is on [ascend/910b4-dense-baseline](https://github.com/Cheongroach/dotLLM/tree/ascend/910b4-dense-baseline).
 
+- [Qwen3.6 feasibility, Ascend/CUDA benchmarks and actual profiling](docs/ASCEND_QWEN36_AND_CUDA.md)
+- [Follow-up evidence, public traces and figures](followup/README.md)
 - [Complete validation results](docs/ASCEND_FULL_RESULTS.md)
 - [Implementation research](docs/ASCEND_IMPLEMENTATION_RESEARCH.md)
 - [Bring-up plan](docs/ASCEND_BRINGUP_PLAN.md)

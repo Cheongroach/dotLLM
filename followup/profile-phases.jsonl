@@ -1,0 +1,12 @@
+{"test": "load", "device": "cuda", "model": "SmolLM-135M.Q8_0.gguf", "elapsedMs": 659.7857}
+{"test": "profile_phase", "phase": "prefill_begin", "utc": "2026-10-24T03:50:33.7759241+00:00"}
+{"test": "profile_phase", "phase": "prefill_end", "elapsedMs": 6.8736, "utc": "2026-10-24T03:50:33.7865581+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 0, "elapsedMs": 4.573, "utc": "2026-10-24T03:50:33.7924065+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 1, "elapsedMs": 4.9237, "utc": "2026-10-24T03:50:33.7998497+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 2, "elapsedMs": 3.9538, "utc": "2026-10-24T03:50:33.8038524+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 3, "elapsedMs": 3.9927, "utc": "2026-10-24T03:50:33.8078712+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 4, "elapsedMs": 5.1511, "utc": "2026-10-24T03:50:33.8130486+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 5, "elapsedMs": 4.12, "utc": "2026-10-24T03:50:33.8171921+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 6, "elapsedMs": 4.9097, "utc": "2026-10-24T03:50:33.8221274+00:00"}
+{"test": "profile_phase", "phase": "decode", "step": 7, "elapsedMs": 4.2075, "utc": "2026-10-24T03:50:33.8263581+00:00"}
+{"test": "execution_complete", "device": "cuda", "mode": "profile", "status": "PASS", "scope": "execution only; numerical checks report PASS/FAIL independently"}

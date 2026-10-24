@@ -1,0 +1,34 @@
+{
+  "accessed": "2026-10-24",
+  "sources": [
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.6-27B/blob/main/config.json",
+      "role": "Official architecture dimensions and precision"
+    },
+    {
+      "url": "https://huggingface.co/Qwen/Qwen3.6-35B-A3B/blob/main/config.json",
+      "role": "Official MoE dimensions"
+    },
+    {
+      "url": "https://qwen.ai/blog?id=qwen3.6-27b&lang=en",
+      "role": "Official quality benchmarks and API/open-weight distinction"
+    },
+    {
+      "url": "https://recipes.vllm.ai/Qwen/Qwen3.6-27B",
+      "role": "Deployment and public MI300X serving measurements; page updated 2026-10-12"
+    },
+    {
+      "url": "https://docs.vllm.ai/projects/ascend/en/latest/tutorials/models/Qwen3.5-27B-Qwen3.6-27B.html",
+      "role": "Ascend support versions, hardware and W8A8 TP2 examples"
+    },
+    {
+      "url": "https://github.com/huggingface/transformers/blob/main/src/transformers/models/qwen3_5/modeling_qwen3_5.py",
+      "role": "GDN recurrence, gate and norm implementation",
+      "retrievedSourceSha256": "af05d0acfe79fff8aea1c75f93516a6a72bc80f6f901329a73e66a3866fe1e7c"
+    },
+    {
+      "url": "https://www.hiascend.com/doc_center/source/zh/canncommercial/80RC2/devaids/auxiliarydevtool/atlasprofiling_16_0011.html",
+      "role": "Official msprof CLI guidance; actual 8.3.RC1 help is archived separately"
+    }
+  ]
+}

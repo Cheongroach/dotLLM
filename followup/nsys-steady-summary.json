@@ -1,0 +1,250 @@
+{
+  "model": "SmolLM-135M.Q8_0.gguf",
+  "device": "NVIDIA H20",
+  "workload": "one warm cached 32-token prefill plus eight forced decode steps",
+  "clockAlignment": "UTC application phase timestamps minus Nsight session epoch; sub-microsecond rounding",
+  "intervalMs": 50.434048,
+  "kernelBusyUnionMs": 22.819752,
+  "kernelBusyFraction": 0.4524671904186632,
+  "limitations": [
+    "Interval includes managed submission, logging, scheduling, CUDA synchronization and copies.",
+    "Kernel busy fraction is timeline occupancy, not SM occupancy or hardware utilization.",
+    "API durations overlap GPU execution; do not subtract or sum them as exclusive costs.",
+    "Single profiled run includes profiler overhead; use unprofiled CLI runs for throughput.",
+    "Initialization, load, first warm-up and destruction are excluded."
+  ],
+  "timings": {
+    "kernel": {
+      "totalMs": 22.819752,
+      "groups": [
+        {
+          "name": "quantized_gemv_q8_0",
+          "calls": 1689,
+          "totalMs": 12.430724,
+          "meanUs": 7.359812907045589,
+          "sharePercent": 54.47352802081285
+        },
+        {
+          "name": "attention_f16",
+          "calls": 270,
+          "totalMs": 5.883042,
+          "meanUs": 21.789044444444443,
+          "sharePercent": 25.780481751072493
+        },
+        {
+          "name": "fused_add_rmsnorm_f16",
+          "calls": 531,
+          "totalMs": 1.690401,
+          "meanUs": 3.1834293785310734,
+          "sharePercent": 7.40762213366736
+        },
+        {
+          "name": "dequant_q8_0_f16",
+          "calls": 210,
+          "totalMs": 0.948673,
+          "meanUs": 4.517490476190476,
+          "sharePercent": 4.1572450042401865
+        },
+        {
+          "name": "rope_f16",
+          "calls": 270,
+          "totalMs": 0.748672,
+          "meanUs": 2.772859259259259,
+          "sharePercent": 3.28080690798042
+        },
+        {
+          "name": "sm80_xmma_gemm_f16f16_f16f32_f32_tn_n_tilesize32x32x64_stage6_warpsize2x2x1_tensor16x8x16_execute_kernel__5x_cublas",
+          "calls": 210,
+          "totalMs": 0.748448,
+          "meanUs": 3.5640380952380952,
+          "sharePercent": 3.2798253022206376
+        },
+        {
+          "name": "swiglu_f16",
+          "calls": 270,
+          "totalMs": 0.28112,
+          "meanUs": 1.0411851851851852,
+          "sharePercent": 1.2319152285265853
+        },
+        {
+          "name": "rmsnorm_f16",
+          "calls": 18,
+          "totalMs": 0.050944,
+          "meanUs": 2.830222222222222,
+          "sharePercent": 0.22324519565330947
+        },
+        {
+          "name": "embedding_lookup_q8_0",
+          "calls": 9,
+          "totalMs": 0.01824,
+          "meanUs": 2.026666666666667,
+          "sharePercent": 0.07993075472511708
+        },
+        {
+          "name": "convert_f16_to_f32",
+          "calls": 9,
+          "totalMs": 0.010528,
+          "meanUs": 1.1697777777777778,
+          "sharePercent": 0.04613547070976056
+        },
+        {
+          "name": "add_f16",
+          "calls": 9,
+          "totalMs": 0.00896,
+          "meanUs": 0.9955555555555555,
+          "sharePercent": 0.039264230391285584
+        }
+      ]
+    },
+    "memcpy": {
+      "totalMs": 0.544545,
+      "groups": [
+        {
+          "name": "memcpy_kind_8",
+          "calls": 549,
+          "totalMs": 0.471232,
+          "meanUs": 0.8583460837887068,
+          "sharePercent": 86.53683350319992
+        },
+        {
+          "name": "memcpy_kind_2",
+          "calls": 9,
+          "totalMs": 0.059136,
+          "meanUs": 6.570666666666667,
+          "sharePercent": 10.859708564030521
+        },
+        {
+          "name": "memcpy_kind_1",
+          "calls": 18,
+          "totalMs": 0.014177,
+          "meanUs": 0.787611111111111,
+          "sharePercent": 2.60345793276956
+        }
+      ]
+    },
+    "api": {
+      "totalMs": 37.744739,
+      "groups": [
+        {
+          "name": "cuStreamSynchronize",
+          "calls": 9,
+          "totalMs": 17.408096,
+          "meanUs": 1934.232888888889,
+          "sharePercent": 46.120589150185936
+        },
+        {
+          "name": "cuLaunchKernel",
+          "calls": 3285,
+          "totalMs": 10.714552,
+          "meanUs": 3.2616596651445966,
+          "sharePercent": 28.38687532055792
+        },
+        {
+          "name": "cuMemcpyHtoD_v2",
+          "calls": 18,
+          "totalMs": 5.074113,
+          "meanUs": 281.8951666666667,
+          "sharePercent": 13.443232446248999
+        },
+        {
+          "name": "cuMemcpyDtoDAsync_v2",
+          "calls": 549,
+          "totalMs": 2.419957,
+          "meanUs": 4.407936247723134,
+          "sharePercent": 6.41137563568793
+        },
+        {
+          "name": "cuMemcpyDtoH_v2",
+          "calls": 9,
+          "totalMs": 1.26174,
+          "meanUs": 140.19333333333336,
+          "sharePercent": 3.3428234859432995
+        },
+        {
+          "name": "cudaLaunchKernelExC_v11060",
+          "calls": 210,
+          "totalMs": 0.860501,
+          "meanUs": 4.097623809523809,
+          "sharePercent": 2.279790568958498
+        },
+        {
+          "name": "cuCtxSetCurrent",
+          "calls": 9,
+          "totalMs": 0.00578,
+          "meanUs": 0.6422222222222221,
+          "sharePercent": 0.01531339241741743
+        }
+      ]
+    }
+  },
+  "phases": [
+    {
+      "test": "profile_phase",
+      "phase": "prefill_begin",
+      "utc": "2026-10-24T03:50:33.7759241+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "prefill_end",
+      "elapsedMs": 6.8736,
+      "utc": "2026-10-24T03:50:33.7865581+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 0,
+      "elapsedMs": 4.573,
+      "utc": "2026-10-24T03:50:33.7924065+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 1,
+      "elapsedMs": 4.9237,
+      "utc": "2026-10-24T03:50:33.7998497+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 2,
+      "elapsedMs": 3.9538,
+      "utc": "2026-10-24T03:50:33.8038524+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 3,
+      "elapsedMs": 3.9927,
+      "utc": "2026-10-24T03:50:33.8078712+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 4,
+      "elapsedMs": 5.1511,
+      "utc": "2026-10-24T03:50:33.8130486+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 5,
+      "elapsedMs": 4.12,
+      "utc": "2026-10-24T03:50:33.8171921+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 6,
+      "elapsedMs": 4.9097,
+      "utc": "2026-10-24T03:50:33.8221274+00:00"
+    },
+    {
+      "test": "profile_phase",
+      "phase": "decode",
+      "step": 7,
+      "elapsedMs": 4.2075,
+      "utc": "2026-10-24T03:50:33.8263581+00:00"
+    }
+  ],
+  "rawSqliteSha256": "4341aed3776efecc4494cff4b0f6032a3c09e21e2ef7f0dde1e3533e948b5f15"
+}

@@ -1,0 +1,123 @@
+msprof (MindStudio Profiler) is part of performance analysis tools powered by MindStudio.
+Usage:
+      ./msprof [--options]
+
+This is subcommand for operator optimization situation:
+      op                                Use binary msopprof to operator optimization (msprof op ...)
+
+Options:
+      --output                          <Optional> Specify the directory that is used for storing data results.(full-platform)
+      --reports                         <Optional> Specify the path that is used for controlling the export scope of collection results.
+      --storage-limit                   <Optional> Specify the output directory volume. range 200MB ~ 4294967295MB.(full-platform)
+      --application                     <Optional> Specify application path, considering the risk of privilege escalation,
+						   please pay attention to the group of the application and 
+						   confirm whether it is the same as the user currently.(full-platform)
+      --ascendcl                        <Optional> Show acl profiling data, the default value is on.(full-platform)
+      --model-execution                 <Optional> Show ge model execution profiling data, the default value is off.(full-platform)
+      --runtime-api                     <Optional> Show runtime api profiling data, the default value is off.(full-platform)
+      --task-time                       <Optional> Show task profiling data, the default value is on.(full-platform)
+						   The switch can be set in range [l0, l1, on, off]
+      --environment                     <Optional> User app custom environment variable configuration.(full-platform)
+      --sys-period                      <Optional> Set total sampling period of system profiling in seconds.(full-platform)
+      --sys-devices                     <Optional> Specify the profiling scope by device ID when collect sys profiling.
+						   The value is all or ID list (split with ',').(full-platform)
+      --hccl                            <Optional> Show hccl profiling data, the default value is off.(full-platform)
+      --msproftx                        <Optional> Show msproftx data, the default value is off.(full-platform)
+      --ai-core                         <Optional> Turn on / off the ai core profiling, the default value is on when collecting
+						   app Profiling.(full-platform)
+      --aic-mode                        <Optional> Set the aic profiling mode to task-based or sample-based.(full-platform)
+						   In task-based mode, profiling data will be collected by tasks.
+						   In sample-based mode, profiling data will be collected in a specific interval.
+						   The default value is task-based.
+      --aic-freq                        <Optional> The aic sampling frequency in hertz, the default value is 100 Hz, the range is
+						   1 to 100 Hz.(full-platform)
+      --task-memory                     <Optional> Show operator memory data, the default value is off.(full-platform)
+      --ge-api                          <Optional> Show GE profiling data, the default value is off.(full-platform), 
+						   The switch can be set in range [l0, l1, off]
+      --aic-metrics                     <Optional> The aic metrics groups, include ArithmeticUtilization, PipeUtilization, Memory,
+						   MemoryL0, ResourceConflictRatio, MemoryUB, L2Cache, MemoryAccess.
+						   You can also customize registers in the format of Custom:xx,xx.
+						   The default value is PipeUtilization.(full-platform)
+      --mstx-domain-include             <Optional> Choose to only include mstx events from a comma separated list of domains;
+						   "default" filters the mstx default domain.(full-platform).
+						   The switch is only applicable when you set msproftx to on,
+						   and it cannot be set with mstx-domain-exclude at the same time.
+      --mstx-domain-exclude             <Optional> Choose to only exclude mstx events from a comma separated list of domains;
+						   "default" excludes mstx events without a domain.(full-platform).
+						   The switch is only applicable when you set msproftx to on,
+						   and it cannot be set with mstx-domain-include at the same time.
+      --dynamic                         <Optional> Dynamic profiling switch, the default value is off.(Ascend910, Ascend910B, Ascend910_93, Ascend310B, Ascend310P)
+      --pid                             <Optional> Dynamic profiling pid of the target process.(Ascend910, Ascend910B, Ascend910_93, Ascend310B, Ascend310P)
+      --delay                           <Optional> Collect start delay time in seconds, range 1 ~ 4294967295s.(Ascend910, Ascend910B, Ascend910_93, Ascend310B, Ascend310P)
+      --duration                        <Optional> Collection duration in seconds, range 1 ~ 4294967295s.(Ascend910, Ascend910B, Ascend910_93, Ascend310B, Ascend310P)
+      --python-path                     <Optional> Specify the python interpreter path that is used for analysis, please
+						   ensure the python version is 3.7.5 or later.(full-platform)
+      --analyze                         <Optional> Switch for using msprof to analyze collecting data,
+						   the default value is off.(full-platform)
+      --rule                            <Optional> Switch specified rule for using msprof to analyze collecting data,
+						   the default value is communication,communication_matrix.(full-platform)
+						   The switch can be set in [communication, communication_matrix]
+      --parse                           <Optional> Switch for using msprof to parse collecting data, the default value
+						   is off.(full-platform)
+      --query                           <Optional> Switch for using msprof to query collecting data, the default value
+						   is off.(full-platform)
+      --export                          <Optional> Switch for using msprof to export collecting data, the default value
+						   is off.(full-platform)
+      --clear                           <Optional> Switch for using msprof to analyze or export data in clear mode, the default value
+						   is off.(full-platform)
+      --iteration-id                    <Optional> The export iteration id, only used when argument export is on,
+						   the default value is 1
+      --model-id                        <Optional> The export model id, only used when argument export is on, msprof will
+						   export minium accessible model by default.(full-platform)
+      --type                            <Optional> The export type, only used when the parameters `application` or `export` 
+						   are set to on or when it is a system-collected value. Include db, text.
+						   The default value is text(which will also export the database).(full-platform)
+      --summary-format                  <Optional> The export summary file format, only used when argument export is on,
+						   include csv, json, the default value is csv.(full-platform)
+      --aicpu                           <Optional> Show aicpu profiling data, the default value is off.(full-platform)
+      --sys-hardware-mem                <Optional> LLC, DDR, HBM acquisition switch, optional on / off, the default value is off.
+						   LLC bandwidth(Ascend310 while set llc-profiling to bandwidth).
+						   LLC usage by aicpu and control cpu(Ascend310 while set llc-profiling to capacity).
+						   LLC read/write speed(Ascend310P, Ascend910, Ascend310B, Ascend910B, Ascend910_93).
+						   DDR read/write speed(Ascend310, Ascend310P, Ascend910, Ascend310B).
+						   HBM read/write speed(Ascend910, Ascend910B, Ascend910_93).
+						   Processes-level and system-level device memory usage(full-platform)
+      --sys-hardware-mem-freq           <Optional> LLC, DDR, HBM acquisition frequency, range 1 ~ 100, the default value is 50 Hz
+      --llc-profiling                   <Optional> The llc profiling groups.
+						   include capacity, bandwidth. the default value is capacity.(Ascend310)
+						   include read, write. the default value is read.
+						   (Ascend310P, Ascend910, Ascend310B, Ascend910B, Ascend910_93)
+      --sys-cpu-profiling               <Optional> The CPU acquisition switch, optional on / off, the default value
+						   is off.(full-platform)
+      --sys-cpu-freq                    <Optional> The cpu sampling frequency in hertz. the default value
+						   is 50 Hz, the range is 1 to 50 Hz.(full-platform)
+      --sys-profiling                   <Optional> The System CPU usage and system memory acquisition switch,
+						   the default value is off.(full-platform)
+      --sys-sampling-freq               <Optional> The sys sampling frequency in hertz. the default value
+						   is 10 Hz, the range is 1 to 10 Hz.(full-platform)
+      --sys-pid-profiling               <Optional> The CPU usage of the process and the memory acquisition
+						   switch of the process, the default value is off.(full-platform)
+      --sys-pid-sampling-freq           <Optional> The pid sampling frequency in hertz. the default value is 10 Hz,
+						   the range is 1 to 10 Hz.(full-platform)
+      --sys-io-profiling                <Optional> NIC ROCE acquisition switch, the default value is off.
+						   NIC(Ascend310, Ascend910, Ascend310B, Ascend910B, Ascend910_93), ROCE(Ascend910, Ascend910B, Ascend910_93)
+      --sys-io-sampling-freq            <Optional> NIC ROCE acquisition frequency, range 1 ~ 100, the default value is 100 Hz.
+						   NIC(Ascend310, Ascend910, Ascend310B, Ascend910B, Ascend910_93), ROCE(Ascend910, Ascend910B, Ascend910_93)
+      --sys-interconnection-profiling   <Optional> PCIE, HCCS acquisition switch, the default value is off.
+						   PCIE(Ascend310P, Ascend910, Ascend910B, Ascend910_93), HCCS(Ascend910, Ascend910B, Ascend910_93)
+      --sys-interconnection-freq        <Optional> PCIE, HCCS acquisition frequency, range 1 ~ 50, the default value is 50 Hz.
+						   PCIE(Ascend310P, Ascend910, Ascend910B, Ascend910_93), HCCS(Ascend910, Ascend910B, Ascend910_93)
+      --dvpp-profiling                  <Optional> DVPP acquisition switch, the default value is off.(full-platform)
+      --dvpp-freq                       <Optional> DVPP acquisition frequency, range 1 ~ 100, the default value is 50 Hz.(full-platform)
+      --l2                              <Optional> L2 Cache acquisition switch. the default value is off.
+						   (Ascend310P, Ascend910, Ascend310B, Ascend910B, Ascend910_93)
+      --instr-profiling                 <Optional> Show instr profiling data, the default value is off.(Ascend910B, Ascend910_93)
+      --instr-profiling-freq            <Optional> The instr sampling period in clock-cycle, the default value is 1000 cycle,
+						   the range is 300 to 30000 cycle.(Ascend910B, Ascend910_93)
+      --host-sys                        <Optional> The host-sys data type, include cpu, mem, disk, network, osrt.(full-platform)
+      --host-sys-pid                    <Optional> Set the PID of the app process for which you want to collect
+						   performance data.(full-platform)
+      --host-sys-usage                  <Optional> The host-sys-usage data type, include cpu, mem.(full-platform)
+      --host-sys-usage-freq             <Optional> The sampling frequency in hertz. the default value
+						   is 50 Hz, the range is 1 to 50 Hz.(full-platform)
+      --help                            <Optional> help message.(full-platform)
