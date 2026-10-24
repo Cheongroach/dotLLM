@@ -8,6 +8,10 @@ Reference implementation:
 
 https://github.com/Cheongroach/dotLLM/tree/research/continuous-batching-20261018
 
+Published performance-analysis discussion and batch-size-4 methodology:
+
+[BATCH4_PERFORMANCE_ANALYSIS.md](BATCH4_PERFORMANCE_ANALYSIS.md)
+
 This branch documents the intended upstream contribution boundaries. It is not
 an upstream pull request and does not claim ownership of existing issues.
 
