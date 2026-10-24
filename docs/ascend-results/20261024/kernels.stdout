@@ -1,0 +1,23 @@
+{"phase": "environment", "deviceId": 0, "runtime": ".NET 10.0.0", "architecture": "X64", "os": "Debian GNU/Linux 12 (bookworm)"}
+{"test": "linear_f16", "m": 3, "n": 5, "k": 7, "status": "PASS", "maxAbsoluteError": 0.00010335445404052734, "normalizedRmse": 0.00022276121160079822, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"test": "fp32_precision_and_dtype", "status": "PASS", "scope": "residual precision, analytic linear/norm, cast, dtype rejection"}
+{"test": "rms_norm_f16", "status": "PASS", "maxAbsoluteError": 0.0009207725524902344}
+{"test": "bias_add_f16", "status": "PASS", "maxAbsoluteError": 0.01513671875}
+{"test": "residual_add_f16", "status": "PASS", "maxAbsoluteError": 0}
+{"test": "swiglu_f16", "status": "PASS", "maxAbsoluteError": 0.0018796920776367188}
+{"test": "rope_f16_neox=False_rotary=8", "status": "PASS", "maxAbsoluteError": 0.00011903047561645508}
+{"test": "rope_f16_neox=False_rotary=16", "status": "PASS", "maxAbsoluteError": 0.00021326541900634766}
+{"test": "rope_f16_neox=True_rotary=8", "status": "PASS", "maxAbsoluteError": 0.0002193450927734375}
+{"test": "rope_f16_neox=True_rotary=16", "status": "PASS", "maxAbsoluteError": 0.0002257823944091797}
+{"test": "attention_f16_kvheads=1_offset=0", "status": "PASS", "maxAbsoluteError": 0.00011560320854187012}
+{"test": "attention_f16_kvheads=2_offset=3", "status": "PASS", "maxAbsoluteError": 0.00012153387069702148}
+{"test": "attention_f16_kvheads=4_offset=6", "status": "PASS", "maxAbsoluteError": 7.706880569458008e-05}
+{"test": "ownership_and_copy", "status": "PASS"}
+{"test": "backend_contract", "status": "PASS"}
+{"test": "linear_f16", "m": 1, "n": 19, "k": 37, "status": "PASS", "maxAbsoluteError": 0.00031948089599609375, "normalizedRmse": 0.00018384320743585172, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"test": "linear_f16", "m": 5, "n": 33, "k": 65, "status": "PASS", "maxAbsoluteError": 0.0004862546920776367, "normalizedRmse": 0.0002089964641399871, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"test": "linear_f16", "m": 16, "n": 32, "k": 64, "status": "PASS", "maxAbsoluteError": 0.0009615421295166016, "normalizedRmse": 0.00020242312586149323, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"test": "linear_f16", "m": 1, "n": 576, "k": 576, "status": "PASS", "maxAbsoluteError": 0.0019235610961914062, "normalizedRmse": 0.0002087282575584907, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"test": "linear_f16", "m": 7, "n": 129, "k": 1025, "status": "PASS", "maxAbsoluteError": 0.0031385421752929688, "normalizedRmse": 0.0002106097870326779, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"test": "linear_f16", "m": 2, "n": 11, "k": 13, "status": "PASS", "maxAbsoluteError": 0.00019997358322143555, "normalizedRmse": 0.0002055797250444869, "atol": 0.002, "rtol": 0.002, "math": "KEEP_DTYPE", "reference": "scalar double accumulation of the exact uploaded FP16 values"}
+{"status": "PASS", "scope": "Ascend FP16 kernels and runtime smoke", "linearCases": 7, "iterationsPerCase": 3}

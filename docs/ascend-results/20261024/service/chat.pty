@@ -1,0 +1,107 @@
+[?1h=[?25l                      
+[38;5;11m⠋[0m Loading tokenizer...
+                      
+[2A                      
+[38;5;11m⠙[0m Loading tokenizer...
+                      
+[2A                             
+[38;5;11m⠹[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠸[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠼[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠴[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠦[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠧[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠇[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠏[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠋[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠙[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠹[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠸[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠼[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠴[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠦[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠧[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠇[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠏[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠋[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠙[0m Loading Qwen on Ascend 0...
+                             
+[2A                             
+[38;5;11m⠙[0m Loading Qwen on Ascend 0...
+                             
+[2K[1A[2K[1A[2K[?25h── [38;5;8mdotllm chat | Qwen 24L/896H | unknown | Ascend 0 FP32 | greedy[0m ──────────────
+[2mType /exit to quit, /clear to reset history, /system <text> to set system [0m
+[2mprompt.[0m
+
+>>> Hello
+Hello
+[2;38;5;8m[verbose] prompt (154 chars):[0m
+[2;38;5;8m<|im_start|>system[0m
+[2;38;5;8mYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>[0m
+[2;38;5;8m<|im_start|>user[0m
+[2;38;5;8mHello<|im_end|>[0m
+[2;38;5;8m<|im_start|>assistant[0m
+
+
+Hello! How can I assist you today
+[2;38;5;8m[verbose] finish_reason=Length, tokens=8[0m
+[2m[30 prompt tokens, 8 generated tokens, 941 ms TTFT, 32.6 prefill tok/s, 7.8 [0m
+[2mdecode tok/s][0m
+
+>>> What did I just say?
+[2;38;5;8m[verbose] prompt (268 chars):[0m
+[2;38;5;8m<|im_start|>system[0m
+[2;38;5;8mYou are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>[0m
+[2;38;5;8m<|im_start|>user[0m
+[2;38;5;8mHello<|im_end|>[0m
+[2;38;5;8m<|im_start|>assistant[0m
+[2;38;5;8mHello! How can I assist you today<|im_end|>[0m
+[2;38;5;8m<|im_start|>user[0m
+[2;38;5;8mWhat did I just say?<|im_end|>[0m
+[2;38;5;8m<|im_start|>assistant[0m
+
+
+You just said "Hello!"
+[2;38;5;8m[verbose] finish_reason=Stop, tokens=6[0m
+[2m[54 prompt tokens, 6 generated tokens, 751 ms TTFT, 71.9 prefill tok/s, 6.9 [0m
+[2mdecode tok/s][0m
+
+>>> /quit

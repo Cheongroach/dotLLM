@@ -1,0 +1,1 @@
+{"test": "injected_bridge_failure_cleanup", "status": "PASS", "scope": "synthetic bridge error with real AscendCL allocations"}

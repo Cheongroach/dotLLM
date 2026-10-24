@@ -1,0 +1,17 @@
+[2943881:2943881:20261024,040054.966502:WARNING crashpad_client_linux.cc:432] prctl: Invalid argument (22)
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  DotLLM.Core -> /tmp/dotllm-ascend-research/full-20261024/build/bin/DotLLM.Core/release/DotLLM.Core.dll
+  DotLLM.Tokenizers -> /tmp/dotllm-ascend-research/full-20261024/build/bin/DotLLM.Tokenizers/release/DotLLM.Tokenizers.dll
+  DotLLM.Cpu -> /tmp/dotllm-ascend-research/full-20261024/build/bin/DotLLM.Cpu/release/DotLLM.Cpu.dll
+  DotLLM.Models -> /tmp/dotllm-ascend-research/full-20261024/build/bin/DotLLM.Models/release/DotLLM.Models.dll
+  DotLLM.Ascend -> /tmp/dotllm-ascend-research/full-20261024/build/bin/DotLLM.Ascend/release/DotLLM.Ascend.dll
+  DotLLM.Tests.Ascend -> /tmp/dotllm-ascend-research/full-20261024/build/bin/DotLLM.Tests.Ascend/release/DotLLM.Tests.Ascend.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.41
+[2943958:2943958:20261024,040056.563629:WARNING crashpad_client_linux.cc:432] prctl: Invalid argument (22)
+  Determining projects to restore...

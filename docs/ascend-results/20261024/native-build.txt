@@ -1,0 +1,6 @@
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: <validation-package>/build
+[ 50%] Building CXX object CMakeFiles/dotllm_ascend.dir/src/ops.cpp.o
+[100%] Linking CXX shared library libdotllm_ascend.so
+[100%] Built target dotllm_ascend

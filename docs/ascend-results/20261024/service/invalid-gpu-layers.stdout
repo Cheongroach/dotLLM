@@ -1,0 +1,3 @@
+Error: Ascend uses a single NPU and contiguous FP16 KV. GPU layer offload, 
+paged/quantized KV, cache windows and speculative decoding are unsupported. 
+Leave cache-type flags at their defaults.

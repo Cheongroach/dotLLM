@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/Cheongroach/dotLLM",
+  "codeBranch": "ascend/910b4-dense-baseline",
+  "codeCommit": "93010f3e6208a58fdeb27c174b0ca6d2f876250e",
+  "archiveBranch": "archive/ascend-research-20261024",
+  "archiveLayout": "Independent root history; no implementation source tree",
+  "date": "2026-10-24"
+}

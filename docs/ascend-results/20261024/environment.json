@@ -1,0 +1,40 @@
+{
+  "capturedAt": "2026-10-24T04:05:59+08:00",
+  "os": "Debian GNU/Linux 12 (bookworm)",
+  "architecture": "x86_64",
+  "kernel": "5.15.152.bsk.10-amd64",
+  "device": "Ascend910B4-64G (910B4-1)",
+  "logicalOrdinal": 0,
+  "physicalOrdinal": 6,
+  "health": "OK",
+  "driverNpuSmi": "25.5.0",
+  "firmware": "NA (npu-smi board query; independent version unavailable)",
+  "cannToolkit": "8.3.RC1",
+  "cannOps": "8.3.RC1",
+  "compiler": "g++ 12.2.0",
+  "dotnetRuntime": "10.0.0",
+  "aspnetRuntime": "10.0.0",
+  "managedBuildSdk": "10.0.100",
+  "cpuQuota": {
+    "quotaUs": 200000,
+    "periodUs": 100000,
+    "effectiveCores": 2
+  },
+  "memoryLimitBytes": 17179869184,
+  "initialHbmUsedMiB": 3449,
+  "hbmCapacityMiB": 65536,
+  "nativeAbi": 3,
+  "worker": {
+    "controlPlane": "cn",
+    "run": "[internal resource ID]",
+    "trial": "[internal resource ID]",
+    "pod": "[internal resource ID]",
+    "group": "[internal resource]",
+    "cluster": "[internal resource]",
+    "requestedNpus": 1,
+    "requestedCpu": 2,
+    "requestedMemoryGiB": 16
+  },
+  "testExitCode": 0,
+  "resourceStatus": "done"
+}

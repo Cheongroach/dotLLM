@@ -1,0 +1,18 @@
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786330,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"role":"assistant"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786330,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"content":"You"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786331,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"content":" just"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786331,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"content":" said"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786331,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"content":" \u0022"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786331,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"content":"Hello"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786331,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{"content":"!\u0022"}}]}
+
+data: {"id":"chatcmpl-fc701ea945944ab5a2de5d9b06f6f3f1","object":"chat.completion.chunk","created":1792786331,"model":"qwen2.5-0.5b-instruct-q8_0.gguf","choices":[{"index":0,"delta":{},"finish_reason":"stop"}],"usage":{"prompt_tokens":48,"completion_tokens":6,"total_tokens":54},"timings":{"prefill_time_ms":641.121692,"decode_time_ms":683.966049,"sampling_time_ms":0.313201,"prefill_tokens_per_sec":74.86878169768742,"decode_tokens_per_sec":7.310304374479266,"prompt_tokens":48,"generated_tokens":5,"cached_tokens":0,"speculative_draft_tokens":0,"speculative_accepted_tokens":0,"speculative_acceptance_rate":0}}
+
+data: [DONE]
+

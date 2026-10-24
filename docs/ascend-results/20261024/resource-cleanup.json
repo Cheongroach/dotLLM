@@ -1,0 +1,16 @@
+{
+  "controlPlane": "cn",
+  "run": "[internal resource ID]",
+  "status": "done",
+  "trial": "[internal resource ID]",
+  "retainedDevbox": "[internal resource ID]",
+  "evidenceRetrieved": true,
+  "pods": [
+    {
+      "sid": "5389268523",
+      "status": 4,
+      "stopAt": "2026-10-23T20:50:49.000Z"
+    }
+  ],
+  "noActivePods": true
+}
