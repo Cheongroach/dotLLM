@@ -1,0 +1,15 @@
+  DotLLM.Core -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Core/bin/linux/Release/net10.0/DotLLM.Core.dll
+  DotLLM.Cpu -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Cpu/bin/linux/Release/net10.0/DotLLM.Cpu.dll
+  DotLLM.Tokenizers -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Tokenizers/bin/linux/Release/net10.0/DotLLM.Tokenizers.dll
+  DotLLM.Models -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Models/bin/linux/Release/net10.0/DotLLM.Models.dll
+  DotLLM.HuggingFace -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.HuggingFace/bin/linux/Release/net10.0/DotLLM.HuggingFace.dll
+  DotLLM.Engine -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Engine/bin/linux/Release/net10.0/DotLLM.Engine.dll
+  DotLLM.Cuda -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Cuda/bin/linux/Release/net10.0/DotLLM.Cuda.dll
+  DotLLM.Diagnostics -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Diagnostics/bin/linux/Release/net10.0/DotLLM.Diagnostics.dll
+  DotLLM.Telemetry -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Telemetry/bin/linux/Release/net10.0/DotLLM.Telemetry.dll
+  DotLLM.Server -> [WORKSPACE]/external-refs/dotLLM/src/DotLLM.Server/bin/linux/Release/net10.0/DotLLM.Server.dll
+  DotLLM.Tests.Integration -> [WORKSPACE]/external-refs/dotLLM/tests/DotLLM.Tests.Integration/bin/linux/Release/net10.0/DotLLM.Tests.Integration.dll
+Test run for [WORKSPACE]/external-refs/dotLLM/tests/DotLLM.Tests.Integration/bin/linux/Release/net10.0/DotLLM.Tests.Integration.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     4, Skipped:     0, Total:     4, Duration: 4 s - DotLLM.Tests.Integration.dll (net10.0)

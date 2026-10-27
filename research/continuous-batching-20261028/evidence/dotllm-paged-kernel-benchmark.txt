@@ -1,0 +1,3 @@
+{"length":512,"gather_attention_us":604.1566666666666,"paged_attention_us":977.1433333333333,"speedup":0.6182886850445004,"repetitions":5,"iterations":30}
+{"length":4096,"gather_attention_us":3628.4566666666665,"paged_attention_us":2958.73,"speedup":1.2263561280233974,"repetitions":5,"iterations":30}
+{"length":16384,"gather_attention_us":22147.663333333334,"paged_attention_us":18892.66,"speedup":1.1722893088285786,"repetitions":5,"iterations":30}

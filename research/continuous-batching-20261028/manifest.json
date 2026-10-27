@@ -1,0 +1,257 @@
+{
+  "archive_date": "2026-10-28",
+  "repository": "Cheongroach/dotLLM",
+  "branch": "archive/dotllm-docs-and-conversation-20261028",
+  "base_commit": "1ceba8c98f841bfa03f704c3aab32949aae7983d",
+  "scope": "Continuous batching, paged attention, interview manuscripts, visible conversation and historical validation evidence",
+  "file_count_excluding_manifest": 21,
+  "files": [
+    {
+      "original_name": "dotllm-system-walkthrough.md",
+      "archive_path": "documents/dotllm-system-walkthrough.md",
+      "source_bytes": 47380,
+      "source_sha256": "cbe1deb4bdba5eeb45332d41c70637015156a47851372ed17a1b7331c7f834cc",
+      "archive_bytes": 47392,
+      "archive_sha256": "80657b69ca79090b847133a1c793a47b5c0c3da20211505dacb4fb89da5b5ca5",
+      "transformations": [
+        {
+          "type": "portable_markdown_links",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-ablation-study.md",
+      "archive_path": "documents/dotllm-ablation-study.md",
+      "source_bytes": 25170,
+      "source_sha256": "629eb9ca9b7bbebd10a26b795ba8b3a1a66f507932bddac9de2fe670727dac54",
+      "archive_bytes": 25202,
+      "archive_sha256": "7442934b3f9630d3fa4fb1b5d3385eac226934199fdd120f1a66efe5ece081e4",
+      "transformations": [
+        {
+          "type": "portable_markdown_links",
+          "count": 6
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-implementation-notes.md",
+      "archive_path": "documents/dotllm-implementation-notes.md",
+      "source_bytes": 11356,
+      "source_sha256": "9d7aa90f8eca6c07d4523bb160da8c5e9904de98528406cc403dbad4af80f87c",
+      "archive_bytes": 11469,
+      "archive_sha256": "0854412c2860717202d2fa1f4342ac3be006200162b80aed048f84c37b3d0a52",
+      "transformations": [
+        {
+          "type": "portable_markdown_links",
+          "count": 4
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-code-review.md",
+      "archive_path": "documents/dotllm-code-review.md",
+      "source_bytes": 3168,
+      "source_sha256": "7d1ce7f35cc86dfcdfa89414f95bc4c379db4f9d43438731e808e21bee794af7",
+      "archive_bytes": 3168,
+      "archive_sha256": "7d1ce7f35cc86dfcdfa89414f95bc4c379db4f9d43438731e808e21bee794af7",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-pr-description.md",
+      "archive_path": "documents/dotllm-pr-description.md",
+      "source_bytes": 3282,
+      "source_sha256": "66a6360db01e8577dd85a316a6ec3e77e56d50a0a62f7b564b24ea9df838b5a0",
+      "archive_bytes": 3282,
+      "archive_sha256": "66a6360db01e8577dd85a316a6ec3e77e56d50a0a62f7b564b24ea9df838b5a0",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-simd-instruction-reference.md",
+      "archive_path": "documents/dotllm-simd-instruction-reference.md",
+      "source_bytes": 37515,
+      "source_sha256": "b1360fd8bee5522bbf3729407395a3b7623f9517ddab299fb9583a06309d7bfd",
+      "archive_bytes": 37515,
+      "archive_sha256": "b1360fd8bee5522bbf3729407395a3b7623f9517ddab299fb9583a06309d7bfd",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-interview-script.md",
+      "archive_path": "manuscripts/dotllm-interview-script.md",
+      "source_bytes": 8223,
+      "source_sha256": "6bca0d91391f3d111feaec137e854d3758499b620a2a9eeed684bd0d1ee2939d",
+      "archive_bytes": 8223,
+      "archive_sha256": "6bca0d91391f3d111feaec137e854d3758499b620a2a9eeed684bd0d1ee2939d",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-git-guide.md",
+      "archive_path": "manuscripts/dotllm-git-guide.md",
+      "source_bytes": 2759,
+      "source_sha256": "fe5a5a6e084658385a58b4c0c0ae2b0aaa4398488d37489db40d2a4c77a7cb26",
+      "archive_bytes": 2759,
+      "archive_sha256": "fe5a5a6e084658385a58b4c0c0ae2b0aaa4398488d37489db40d2a4c77a7cb26",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-continuous-batching-interview.pptx",
+      "archive_path": "manuscripts/dotllm-continuous-batching-interview.pptx",
+      "source_bytes": 54826,
+      "source_sha256": "d3938a1ae2f8cf72e768f6565e4fa73558db245e9c6b55a73aa757e296477ab3",
+      "archive_bytes": 54826,
+      "archive_sha256": "d3938a1ae2f8cf72e768f6565e4fa73558db245e9c6b55a73aa757e296477ab3",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-gpu-benchmark.jsonl",
+      "archive_path": "evidence/dotllm-gpu-benchmark.jsonl",
+      "source_bytes": 2793,
+      "source_sha256": "dcc370eedda2c204380ef28af8b4323fd4f99dcfb9d22efe6711a19c0ea967f9",
+      "archive_bytes": 2793,
+      "archive_sha256": "dcc370eedda2c204380ef28af8b4323fd4f99dcfb9d22efe6711a19c0ea967f9",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-cpu-benchmark.jsonl",
+      "archive_path": "evidence/dotllm-cpu-benchmark.jsonl",
+      "source_bytes": 869,
+      "source_sha256": "84196c782976515bcd8348e7db4171307ff46f712052757733ee6e40a8f818c3",
+      "archive_bytes": 869,
+      "archive_sha256": "84196c782976515bcd8348e7db4171307ff46f712052757733ee6e40a8f818c3",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-paged-kernel-benchmark.log",
+      "archive_path": "evidence/dotllm-paged-kernel-benchmark.txt",
+      "source_bytes": 451,
+      "source_sha256": "fc9b3b80208c20f68af313ff023a891fe8c61a699de3774ea2cfc3b48a6cf8d0",
+      "archive_bytes": 451,
+      "archive_sha256": "fc9b3b80208c20f68af313ff023a891fe8c61a699de3774ea2cfc3b48a6cf8d0",
+      "transformations": []
+    },
+    {
+      "original_name": "dotllm-gpu-validation-3.log",
+      "archive_path": "evidence/dotllm-gpu-validation-3.txt",
+      "source_bytes": 23297,
+      "source_sha256": "2d21efb8a4f1f1296e0e0d8d4a9b75d97a3f75ea743841769cc4e50c3a259c5f",
+      "archive_bytes": 13412,
+      "archive_sha256": "01152d5dda7cd612e17dd958bfa37bff7e10ac63b70517b64702815f642a91e9",
+      "transformations": [
+        {
+          "type": "terminal_escape_removal",
+          "count": 399
+        },
+        {
+          "type": "resource_placement_redaction",
+          "count": 2
+        },
+        {
+          "type": "storage_mount_redaction",
+          "count": 2
+        },
+        {
+          "type": "LF_line_endings_and_trailing_whitespace_normalization"
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-gpu-validation-2.log",
+      "archive_path": "evidence/dotllm-gpu-validation-2.txt",
+      "source_bytes": 20663,
+      "source_sha256": "4b1658b5423a9c8763718c912af20192f230101ecf54ba38825c56dfb0cc7d4c",
+      "archive_bytes": 11219,
+      "archive_sha256": "08ea010846d6385688a4551e85a4584ac1c36bec840f775116f5f3615194307a",
+      "transformations": [
+        {
+          "type": "terminal_escape_removal",
+          "count": 389
+        },
+        {
+          "type": "resource_placement_redaction",
+          "count": 2
+        },
+        {
+          "type": "storage_mount_redaction",
+          "count": 2
+        },
+        {
+          "type": "LF_line_endings_and_trailing_whitespace_normalization"
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-unit-test.log",
+      "archive_path": "evidence/dotllm-unit-test.txt",
+      "source_bytes": 11478,
+      "source_sha256": "7de742ef8f558d629317654bbade35760281338e04d869ee6e04166efa582a6a",
+      "archive_bytes": 10958,
+      "archive_sha256": "5bc9a106bc1c07476d19ef77a9f1f7eb39275a2033734b445c7ccfe23c4a920e",
+      "transformations": [
+        {
+          "type": "workspace_path_redaction",
+          "count": 13
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-real-model-test.log",
+      "archive_path": "evidence/dotllm-real-model-test.txt",
+      "source_bytes": 2141,
+      "source_sha256": "fc2d04fe45007cbc6eb51e7c15399ad07b3fcd47a86f46450e9f80fbce849798",
+      "archive_bytes": 1661,
+      "archive_sha256": "f5ef9384343edaefae0da5b24fc725f8f722b5d40d3add24353c5031eb15cf2e",
+      "transformations": [
+        {
+          "type": "workspace_path_redaction",
+          "count": 12
+        }
+      ]
+    },
+    {
+      "original_name": "dotllm-server-test.log",
+      "archive_path": "evidence/dotllm-server-test.txt",
+      "source_bytes": 2247,
+      "source_sha256": "016abfcb358c3998f56a71ecc1a91f5b5a9a3d67a4b2deb82ba7ae7064d92334",
+      "archive_bytes": 1727,
+      "archive_sha256": "8770f993621c7b75ee5f59b938d52a640647bcf5293feedb04a6dc5b300130c1",
+      "transformations": [
+        {
+          "type": "workspace_path_redaction",
+          "count": 13
+        }
+      ]
+    },
+    {
+      "original_name": null,
+      "archive_path": "README.md",
+      "archive_bytes": 5314,
+      "archive_sha256": "edb4e6500e82c9fff0f116cfe4dcebf79cfc03361502340ed503d2308a6b2c89",
+      "transformations": [],
+      "source": "generated_archive_metadata"
+    },
+    {
+      "original_name": null,
+      "archive_path": "conversation/transcript.md",
+      "archive_bytes": 35785,
+      "archive_sha256": "826a147ab21748b4ce393788f3b5f98bccd07517a8fe15796f4834e9e300c615",
+      "transformations": [],
+      "source": "current_visible_conversation_context"
+    },
+    {
+      "original_name": null,
+      "archive_path": "conversation/transcript.jsonl",
+      "archive_bytes": 37982,
+      "archive_sha256": "24c7e136b2592138bc7eb6cdef16b6003819931f8c07cc604eb745188175da07",
+      "transformations": [],
+      "source": "current_visible_conversation_context"
+    },
+    {
+      "original_name": null,
+      "archive_path": "conversation/provenance.json",
+      "archive_bytes": 1262,
+      "archive_sha256": "86010fd0545cfdd30d84134543af03abfce98be323545c09e116f5dd15bea886",
+      "transformations": [],
+      "source": "generated_archive_metadata"
+    }
+  ]
+}

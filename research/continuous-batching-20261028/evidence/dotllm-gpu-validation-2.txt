@@ -1,0 +1,2166 @@
+╭─────────────────────────────────────────────────╮
+[REDACTED_STORAGE_INFO]
+[REDACTED_STORAGE_INFO]
+╰─────────────────────────────────────────────────╯
+
+Launch Worker
+1 total · 0 running · 1 pending · 0 warning · 0 failed
+
+Resources
+  GPU 1 × H20   CPU 16   Memory 128Gi   Node 1
+  Type arnold
+[REDACTED_RESOURCE_PLACEMENT]
+  Queue compute-124-hl-cloudnati...
+
+Workers
+⣽  worker-0 (4302159)
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+  Waiting for worker status...
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2s
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 4s
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 7s
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 12s
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302159) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302159) Starting
+
+1 total · 0 running · 0 pending · 1 warning · 0 failed
+
+
+
+
+
+
+
+
+⏳ worker-0 (4302159) Starting
+  Waiting to be scheduled for 15s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)             Launch Worker
+1 total · 0 running · 0 pending · 1 warning · 0 failed
+
+Resources
+  GPU 1 × H20   CPU 16   Memory 128Gi   Node 1
+  Type arnold
+[REDACTED_RESOURCE_PLACEMENT]
+  Queue compute-124-hl-cloudnati...
+
+Workers
+⏳ worker-0 (4302159) Pending
+  Waiting to be scheduled for 20s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+  URL: https://ml.bytedance.net/development/instance/jobs/29d27332bca31f4e
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 26s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 33s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 38s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 41s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 48s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 53s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m0s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m4s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m8s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m18s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m23s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m30s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m34s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m40s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m46s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m52s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m58s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m2s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m9s
+
+
+1 total · all workers ready
+
+
+
+
+
+
+
+
+✔ worker-0 (4302159)
+  Ready
+  IP: 2605:340:cd51:4900:7ec9:e227:7dd5:62c3
+
+
+✔ All workers are ready
+  Remote execution is starting.
+ℹ [2026-09-22 07:20:42] Login Worker...
+Downloading selected validation artifacts
+name, driver_version, memory.total [MiB]
+NVIDIA H20, 535.161.08, 97871 MiB
+PASS GPU scalar attention (4, 4, 19, 19, 0)
+PASS GPU scalar attention (8, 2, 277, 3, 0)
+PASS GPU scalar attention (4, 1, 277, 1, 17)
+PASS GPU scalar attention (4, 2, 19, 3, 1)
+PASS GPU real-model concurrent greedy parity
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":8,"max_tokens":32,"arrival_ms":0,"max_sequences":1,"seconds":0.7137438,"generated_tokens":256,"tokens_per_second":358.67211736200017,"ttft_p50_ms":262.2928,"ttft_p95_ms":622.2061,"itl_p50_ms":2.6788,"itl_p95_ms":2.941,"forwards":256,"max_batch_sequences":1,"mean_batch_sequences":1,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":8,"max_tokens":32,"arrival_ms":0,"max_sequences":4,"seconds":0.3648398,"generated_tokens":256,"tokens_per_second":701.6778322979018,"ttft_p50_ms":7.4679,"ttft_p95_ms":188.3539,"itl_p50_ms":5.711,"itl_p95_ms":6.5499,"forwards":65,"max_batch_sequences":4,"mean_batch_sequences":3.9384615384615387,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+GPU_VALIDATION_COMPLETE
+✔ [2026-09-22 07:21:03] Gracefully exit worker.
+LAUNCH_RETURN_CODE 0

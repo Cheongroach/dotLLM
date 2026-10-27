@@ -1,0 +1,31 @@
+{
+  "export_date": "2026-10-28",
+  "source_type": "visible_context_excerpt",
+  "session_id": "6aca08e990b504c2ca6b4947",
+  "source": "Messages available in the current assistant context, transcribed for this archive. Not a native platform export.",
+  "coverage": "Partial. Visible user messages and assistant final responses through the archive request; no per-message timestamps available.",
+  "complete_history": false,
+  "message_count": 19,
+  "role_counts": {
+    "user": 14,
+    "assistant": 5
+  },
+  "unavailable": [
+    "Earlier assistant responses absent from the current context",
+    "Original cloud history; retrieval failed because the context service was unavailable",
+    "Earlier tool calls and their full execution records"
+  ],
+  "excluded": [
+    "system/developer instructions",
+    "hidden reasoning",
+    "tool calls and outputs",
+    "intermediate commentary",
+    "other sessions",
+    "user-profile and project-memory files"
+  ],
+  "transformations": [
+    "Formatting normalized during manual transcription",
+    "Markdown link destinations ported to fixed code commit or archived document paths"
+  ],
+  "archive_cutoff": "The user request to upload these materials; the ongoing upload commentary and final response are not included."
+}

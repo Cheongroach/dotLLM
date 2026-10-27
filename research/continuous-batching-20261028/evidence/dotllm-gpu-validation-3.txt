@@ -1,0 +1,2246 @@
+╭─────────────────────────────────────────────────╮
+[REDACTED_STORAGE_INFO]
+[REDACTED_STORAGE_INFO]
+╰─────────────────────────────────────────────────╯
+
+Launch Worker
+1 total · 0 running · 1 pending · 0 warning · 0 failed
+
+Resources
+  GPU 1 × H20   CPU 16   Memory 128Gi   Node 1
+  Type arnold
+[REDACTED_RESOURCE_PLACEMENT]
+  Queue compute-124-hl-cloudnati...
+
+Workers
+⣽  worker-0 (4302180)
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+  Waiting for worker status...
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2s
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+  Waiting to be scheduled for 4s
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 7s
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 12s
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣾  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣽  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣻  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⢿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⡿  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣟  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣯  worker-0 (4302180) Starting
+
+
+
+
+
+
+
+
+
+
+⣷  worker-0 (4302180) Starting
+
+1 total · 0 running · 0 pending · 1 warning · 0 failed
+
+
+
+
+
+
+
+
+⏳ worker-0 (4302180) Starting
+  Waiting to be scheduled for 15s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 19s
+Launch Worker
+1 total · 0 running · 0 pending · 1 warning · 0 failed
+
+Resources
+  GPU 1 × H20   CPU 16   Memory 128Gi   Node 1
+  Type arnold
+[REDACTED_RESOURCE_PLACEMENT]
+  Queue compute-124-hl-cloudnati...
+
+Workers
+⏳ worker-0 (4302180) Pending
+  Waiting to be scheduled for 23s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+  URL: https://ml.bytedance.net/development/instance/jobs/6bae2a8b63f44204
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 33s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 36s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 41s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 47s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 52s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 58s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m2s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m9s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m14s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m22s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m29s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m35s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m40s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m45s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m50s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m55s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 1m58s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m3s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m10s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m15s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m19s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m25s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m32s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m38s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m47s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m50s
+  Quota used: A100-80G 0/0, H20 14/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 2m57s
+  Quota used: A100-80G 0/0, H20 13/32 (+1 more)
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 3m5s
+
+
+
+
+
+
+
+
+
+
+
+
+  Waiting to be scheduled for 3m10s
+
+
+1 total · all workers ready
+
+
+
+
+
+
+
+
+✔ worker-0 (4302180)
+  Ready
+  IP: 2605:340:cd51:4900:c094:6101:fa8c:f2ec
+
+
+✔ All workers are ready
+  Remote execution is starting.
+ℹ [2026-09-22 07:26:45] Login Worker...
+Downloading selected validation artifacts
+name, driver_version, memory.total [MiB]
+NVIDIA H20, 535.161.08, 97871 MiB
+PASS GPU scalar attention (4, 4, 19, 19, 0)
+PASS GPU scalar attention (8, 2, 277, 3, 0)
+PASS GPU scalar attention (4, 1, 277, 1, 17)
+PASS GPU scalar attention (4, 2, 19, 3, 1)
+PASS GPU real-model concurrent greedy parity
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":32,"max_tokens":64,"arrival_ms":0,"max_sequences":1,"seconds":5.9111691,"generated_tokens":2048,"tokens_per_second":346.4627665616942,"ttft_p50_ms":2778.0965,"ttft_p95_ms":5534.222,"itl_p50_ms":2.8715,"itl_p95_ms":3.3317,"forwards":2048,"max_batch_sequences":1,"mean_batch_sequences":1,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":32,"max_tokens":64,"arrival_ms":0,"max_sequences":4,"seconds":3.4090515,"generated_tokens":2048,"tokens_per_second":600.7536113784142,"ttft_p50_ms":1284.4597,"ttft_p95_ms":2988.3721,"itl_p50_ms":6.7002,"itl_p95_ms":8.4462,"forwards":513,"max_batch_sequences":4,"mean_batch_sequences":3.992202729044834,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":32,"max_tokens":64,"arrival_ms":0,"max_sequences":1,"seconds":5.8797506,"generated_tokens":2048,"tokens_per_second":348.31409345831776,"ttft_p50_ms":2755.3068,"ttft_p95_ms":5509.3995,"itl_p50_ms":2.8708,"itl_p95_ms":3.3247,"forwards":2048,"max_batch_sequences":1,"mean_batch_sequences":1,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":32,"max_tokens":64,"arrival_ms":0,"max_sequences":4,"seconds":3.4142219,"generated_tokens":2048,"tokens_per_second":599.8438472906521,"ttft_p50_ms":1290.622,"ttft_p95_ms":2993.3258,"itl_p50_ms":6.7108,"itl_p95_ms":8.4648,"forwards":513,"max_batch_sequences":4,"mean_batch_sequences":3.992202729044834,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":32,"max_tokens":64,"arrival_ms":0,"max_sequences":1,"seconds":5.8900675,"generated_tokens":2048,"tokens_per_second":347.70399490328424,"ttft_p50_ms":2763.9085,"ttft_p95_ms":5519.9164,"itl_p50_ms":2.8695,"itl_p95_ms":3.3297,"forwards":2048,"max_batch_sequences":1,"mean_batch_sequences":1,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+{"backend":"gpu","model":"model.gguf","threads":4,"requests":32,"max_tokens":64,"arrival_ms":0,"max_sequences":4,"seconds":3.4011002,"generated_tokens":2048,"tokens_per_second":602.1580899027908,"ttft_p50_ms":1283.8914,"ttft_p95_ms":2981.6229,"itl_p50_ms":6.6809,"itl_p95_ms":8.4358,"forwards":513,"max_batch_sequences":4,"mean_batch_sequences":3.992202729044834,"kv_pages_reclaimed":true,"runtime":"10.0.12","logical_processors":13}
+GPU_VALIDATION_COMPLETE
+✔ [2026-09-22 07:27:35] Gracefully exit worker.
+LAUNCH_RETURN_CODE 0
